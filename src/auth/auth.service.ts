@@ -24,6 +24,13 @@ export class AuthService {
     const matchedPasswords = await bcrypt.compare(password, user.password);
     if (!matchedPasswords) throw new BadRequestException('Invalid password');
 
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        last_login: new Date(),
+      },
+    });
+
     return this.signToken(user.id, user.email, user.role.name);
   }
 
