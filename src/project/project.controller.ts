@@ -47,6 +47,11 @@ export class ProjectController {
     });
   }
 
+  @Get('user/:id')
+  async getUserProjects(@Param('id') userId: string) {
+    return this.projectService.getAllProjects({ userId });
+  }
+
   @Post()
   async createProject(@Request() req, @Body() body: CreateProjectDto) {
     return this.projectService.createProject({ role: req.user.role, body });

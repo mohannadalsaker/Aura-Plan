@@ -15,7 +15,7 @@ import {
 export class ProjectService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllProjects({ role, userId }: { role: UserRole; userId: string }) {
+  async getAllProjects({ role, userId }: { role?: UserRole; userId: string }) {
     const projects = await this.prisma.project.findMany({
       where:
         role === 'ADMIN'

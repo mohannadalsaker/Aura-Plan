@@ -30,20 +30,26 @@ export class TaskController {
     });
   }
 
+  @Get('/project/:id')
+  async getTasksByProjectId(@Param('id') id: string, @Request() req) {
+    return this.taskService.getAllTasks({
+      role: req.user.role,
+      userId: req.user.id,
+      projectId: id,
+    });
+  }
+
+  @Get('/user/:id')
+  async getUserTasks(@Param('id') userId: string) {
+    return this.taskService.getAllTasks({ userId });
+  }
+
   @Get(':id')
   async getTaskById(@Param('id') id: string, @Request() req) {
     return this.taskService.getTask({
       role: req.user.role,
       taskId: id,
       userId: req.user.id,
-    });
-  }
-  @Get('project/:id')
-  async getTasksByProjectId(@Param('id') id: string, @Request() req) {
-    return this.taskService.getAllTasks({
-      role: req.user.role,
-      userId: req.user.id,
-      projectId: id,
     });
   }
 
@@ -55,6 +61,7 @@ export class TaskController {
       userId: req.user.id,
     });
   }
+
   @Post('changeStatus/:id')
   async changeTaskStatus(
     @Request() req,

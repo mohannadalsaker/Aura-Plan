@@ -30,34 +30,39 @@ export class TaskService {
     userId,
     projectId,
   }: {
-    role: UserRole;
+    role?: UserRole;
     userId: string;
     projectId?: string;
   }) {
-    const tasks = await this.prisma.task.findMany({
-      where: {
-        ...(projectId ? { project_id: projectId } : {}),
-        ...(role === 'ADMIN'
-          ? {}
-          : {
-              OR: [
-                { creator_id: userId },
-                {
-                  users: {
-                    some: { user_id: userId },
+    try {
+      const tasks = await this.prisma.task.findMany({
+        where: {
+          ...(projectId ? { project_id: projectId } : {}),
+          ...(role === 'ADMIN'
+            ? {}
+            : {
+                OR: [
+                  { creator_id: userId },
+                  {
+                    users: {
+                      some: { user_id: userId },
+                    },
                   },
-                },
-              ],
-            }),
-      },
-      orderBy: { created_at: 'asc' },
-      include: {
-        project: true,
-        creator: { omit: { password: true } },
-      },
-    });
+                ],
+              }),
+        },
+        orderBy: { created_at: 'asc' },
+        include: {
+          project: true,
+          creator: { omit: { password: true } },
+        },
+      });
 
-    return tasks;
+      return tasks;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException('internal');
+    }
   }
 
   async getTask({
