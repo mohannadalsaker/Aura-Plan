@@ -1,0 +1,46 @@
+import MainButton from "@/shared/components/MainButton";
+import MainTable from "@/shared/components/MainTable";
+import { Box, Stack } from "@mui/material";
+import { Plus } from "lucide-react";
+import { useRolesTable } from "../hooks/useRolesTable";
+import type { RoleTableRow } from "../types";
+import RoleForm from "./RoleForm";
+import CustomDialog from "@/shared/components/CustomDialog";
+import { useRolesTableActions } from "../hooks/useRolesTableActions";
+
+export const RolesPageContent = () => {
+  const { rows, columns } = useRolesTable();
+  const {
+    confirmDelete,
+    closeDialog,
+    openDrawerAdd,
+    isPending,
+    openDeleteId,
+    tableActions,
+  } = useRolesTableActions();
+  return (
+    <Stack gap={3}>
+      <RoleForm />
+      <CustomDialog
+        open={Boolean(openDeleteId)}
+        onClose={closeDialog}
+        onConfirm={confirmDelete}
+        loading={isPending}
+        title="Confirm Delete"
+        subtitle="Are you sure you want to delete this role?"
+      />
+      <Stack direction={"row"} justifyContent={"flex-end"}>
+        <MainButton onClick={openDrawerAdd}>
+          Add role <Plus size={20} />
+        </MainButton>
+      </Stack>
+      <Box sx={{ backgroundColor: "#e1fdeeff" }}>
+        <MainTable<RoleTableRow>
+          actions={tableActions}
+          columns={columns}
+          rows={rows}
+        />
+      </Box>
+    </Stack>
+  );
+};
