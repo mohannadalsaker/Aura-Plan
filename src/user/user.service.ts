@@ -130,7 +130,7 @@ export class UserService {
 
   async deleteUser({ role, id }: { role: UserRole; id: string }) {
     await this.getUserById({ role, id });
-    this.prisma.user.delete({ where: { id } });
+    await this.prisma.user.delete({ where: { id } });
     return 'User deleted';
   }
 }
