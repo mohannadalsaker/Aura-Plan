@@ -3,13 +3,21 @@ import { useDialogStore } from "@/stores/form/dialog";
 import { useDrawerStore } from "@/stores/form/drawer";
 import { useDeleteUser } from "../api/useDeleteUser";
 import type { UserTableRow } from "../types";
+import { useNavigate } from "react-router-dom";
 
 export const useUsersTableActions = () => {
+  const navigate = useNavigate();
   const { mutate, isPending } = useDeleteUser();
   const { openDeleteId, openDeleteDialog, closeDialog } = useDialogStore();
   const { openDrawerEdit, openDrawerAdd } = useDrawerStore();
 
   const tableActions: MainTableProps<UserTableRow>["actions"] = [
+    {
+      label: "View details",
+      action: (row) => {
+        navigate(`view/${row.id}`);
+      },
+    },
     {
       label: "Edit",
       action: (row) => {

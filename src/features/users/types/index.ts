@@ -27,6 +27,7 @@ export interface SingleUserData {
   email: string;
   created_at: string;
   updated_at: string;
+  last_login: string;
   role: {
     id: string;
     name: string;
