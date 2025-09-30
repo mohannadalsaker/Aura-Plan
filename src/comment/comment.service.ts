@@ -9,16 +9,21 @@ import { TaskService } from 'src/task/task.service';
 import { UserRole } from 'src/user/types';
 import { CreateCommentDto } from './dto/comment.dto';
 import passport from 'passport';
+import { PermissionService } from 'src/permission/permission.service';
 
 @Injectable()
 export class CommentService {
   constructor(
     private prisma: PrismaService,
     private taskService: TaskService,
+    private permissionService: PermissionService,
   ) {}
 
-  async getAllComments({ role }: { role: UserRole }) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('User not allowed');
+  async getAllComments({ role }: { role: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_COMMENT',
+    });
     const comments = await this.prisma.comment.findMany({
       include: {
         user: { omit: { password: true } },
@@ -33,10 +38,14 @@ export class CommentService {
     userId,
     taskId,
   }: {
-    role: UserRole;
+    role: string;
     userId: string;
     taskId: string;
   }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_COMMENT',
+    });
     const task = await this.taskService.getTask({
       role,
       userId,
@@ -52,10 +61,14 @@ export class CommentService {
     userId,
     commentId,
   }: {
-    role: UserRole;
+    role: string;
     userId: string;
     commentId: string;
   }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_COMMENT',
+    });
     const comment = await this.prisma.comment.findUnique({
       where: {
         id: commentId,
@@ -74,11 +87,15 @@ export class CommentService {
     taskId,
     body,
   }: {
-    role: UserRole;
+    role: string;
     userId: string;
     taskId: string;
     body: CreateCommentDto;
   }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'CREATE_COMMENT',
+    });
     await this.taskService.getTask({ role, userId, taskId });
     await this.prisma.comment.create({
       data: {
@@ -95,10 +112,14 @@ export class CommentService {
     userId,
     id,
   }: {
-    role: UserRole;
+    role: string;
     userId: string;
     id: string;
   }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'DELETE_COMMENT',
+    });
     await this.getComment({ role, userId, commentId: id });
 
     await this.prisma.comment.delete({ where: { id } });

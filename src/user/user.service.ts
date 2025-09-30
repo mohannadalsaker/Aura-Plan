@@ -9,13 +9,20 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserRole } from './types';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
+import { PermissionService } from 'src/permission/permission.service';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private permissionService: PermissionService,
+  ) {}
 
-  async getUserById({ role, id }: { role: UserRole; id: string }) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not allowed');
+  async getUserById({ role, id }: { role: string; id: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_USER',
+    });
     const user = await this.prisma.user.findUnique({
       where: { id },
       omit: {
@@ -28,8 +35,11 @@ export class UserService {
     return user;
   }
 
-  async getUsers(role: UserRole) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not allowed');
+  async getUsers(role: string) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_USER',
+    });
     const users = await this.prisma.user.findMany({
       include: { role: { omit: { permissions: true } } },
       omit: { password: true },
@@ -38,8 +48,11 @@ export class UserService {
     return users;
   }
 
-  async getMemberUsers(role: UserRole) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not allowed');
+  async getMemberUsers(role: string) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_USER',
+    });
 
     const users = await this.prisma.user.findMany({
       where: {
@@ -64,8 +77,11 @@ export class UserService {
     return users;
   }
 
-  async getManagerUsers(role: UserRole) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not allowed');
+  async getManagerUsers(role: string) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_USER',
+    });
 
     const users = await this.prisma.user.findMany({
       where: {
@@ -79,8 +95,11 @@ export class UserService {
     return users;
   }
 
-  async createUser({ role, body }: { role: UserRole; body: CreateUserDto }) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not allowed');
+  async createUser({ role, body }: { role: string; body: CreateUserDto }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'CREATE_USER',
+    });
     const { password, role_id, ...rest } = body;
     const user = await this.prisma.user.findUnique({
       where: { email: rest.email },
@@ -106,10 +125,13 @@ export class UserService {
     body,
   }: {
     userId: string;
-    role: UserRole;
+    role: string;
     body: UpdateUserDto;
   }) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not Allowed');
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'UPDATE_USER',
+    });
     const { role_id, ...rest } = body;
     await this.getUserById({ role, id: userId });
     await this.prisma.user.update({
@@ -128,7 +150,11 @@ export class UserService {
     return 'User updated';
   }
 
-  async deleteUser({ role, id }: { role: UserRole; id: string }) {
+  async deleteUser({ role, id }: { role: string; id: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'DELETE_USER',
+    });
     await this.getUserById({ role, id });
     await this.prisma.user.delete({ where: { id } });
     return 'User deleted';

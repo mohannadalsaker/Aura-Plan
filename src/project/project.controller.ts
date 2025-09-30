@@ -48,8 +48,8 @@ export class ProjectController {
   }
 
   @Get('user/:id')
-  async getUserProjects(@Param('id') userId: string) {
-    return this.projectService.getAllProjects({ userId });
+  async getUserProjects(@Request() req, @Param('id') userId: string) {
+    return this.projectService.getAllProjects({ role: req.user.role, userId });
   }
 
   @Post()

@@ -15,6 +15,7 @@ import {
 } from './dto/task.dto';
 import { RoleService } from 'src/role/role.service';
 import { UserService } from 'src/user/user.service';
+import { PermissionService } from 'src/permission/permission.service';
 
 @Injectable()
 export class TaskService {
@@ -23,6 +24,7 @@ export class TaskService {
     private projectService: ProjectService,
     private roleService: RoleService,
     private userService: UserService,
+    private permissionService: PermissionService,
   ) {}
 
   async getAllTasks({
@@ -30,39 +32,38 @@ export class TaskService {
     userId,
     projectId,
   }: {
-    role?: UserRole;
+    role: string;
     userId: string;
     projectId?: string;
   }) {
-    try {
-      const tasks = await this.prisma.task.findMany({
-        where: {
-          ...(projectId ? { project_id: projectId } : {}),
-          ...(role === 'ADMIN'
-            ? {}
-            : {
-                OR: [
-                  { creator_id: userId },
-                  {
-                    users: {
-                      some: { user_id: userId },
-                    },
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_TASK',
+    });
+    const tasks = await this.prisma.task.findMany({
+      where: {
+        ...(projectId ? { project_id: projectId } : {}),
+        ...(role === 'ADMIN'
+          ? {}
+          : {
+              OR: [
+                { creator_id: userId },
+                {
+                  users: {
+                    some: { user_id: userId },
                   },
-                ],
-              }),
-        },
-        orderBy: { created_at: 'asc' },
-        include: {
-          project: true,
-          creator: { omit: { password: true } },
-        },
-      });
+                },
+              ],
+            }),
+      },
+      orderBy: { created_at: 'asc' },
+      include: {
+        project: true,
+        creator: { omit: { password: true } },
+      },
+    });
 
-      return tasks;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException('internal');
-    }
+    return tasks;
   }
 
   async getTask({
@@ -71,11 +72,15 @@ export class TaskService {
     taskId,
     withComments,
   }: {
-    role: UserRole;
+    role: string;
     userId?: string;
     taskId: string;
     withComments?: boolean;
   }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_TASK',
+    });
     const task = await this.prisma.task.findUnique({
       where: {
         id: taskId,
@@ -110,21 +115,14 @@ export class TaskService {
     userId,
     body,
   }: {
-    role: UserRole;
+    role: string;
     userId: string;
     body: CreateTaskDto;
   }) {
-    const user = await this.userService.getUserById({
-      role: 'ADMIN',
-      id: userId,
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'CREATE_TASK',
     });
-    const foundRole = await this.roleService.getRoleById({
-      role: 'ADMIN',
-      id: user.role_id,
-    });
-
-    if (!foundRole.permissions.includes('CREATE_TASK'))
-      throw new UnauthorizedException("You don't have permission");
 
     const { project_id, users, start_date, end_date, ...rest } = body;
     await this.projectService.getProject({ role, userId, id: project_id });
@@ -153,22 +151,15 @@ export class TaskService {
     taskId,
     body,
   }: {
-    role: UserRole;
+    role: string;
     userId: string;
     taskId: string;
     body: UpdateTaskDto;
   }) {
-    const user = await this.userService.getUserById({
-      role: 'ADMIN',
-      id: userId,
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'UPDATE_TASK',
     });
-    const foundRole = await this.roleService.getRoleById({
-      role: 'ADMIN',
-      id: user.role_id,
-    });
-
-    if (!foundRole.permissions.includes('UPDATE_TASK'))
-      throw new UnauthorizedException("You don't have permission");
 
     const { project_id, users, start_date, end_date, ...rest } = body;
     await this.projectService.getProject({ role, userId, id: project_id });
@@ -212,7 +203,11 @@ export class TaskService {
     ]);
   }
 
-  async deleteTask({ role, id }: { role: UserRole; id: string }) {
+  async deleteTask({ role, id }: { role: string; id: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'DELETE_TASK',
+    });
     await this.getTask({ role, taskId: id });
     await this.prisma.task.delete({ where: { id } });
     return 'Task Deleted';
@@ -226,7 +221,7 @@ export class TaskService {
   }: {
     id: string;
     body: ChangeTaskStatusDto;
-    role: UserRole;
+    role: string;
     userId: string;
   }) {
     await this.getTask({ role, taskId: id, userId });

@@ -10,12 +10,20 @@ import {
   CreateProjectDto,
   UpdateProjectDto,
 } from './dto/project.dto';
+import { PermissionService } from 'src/permission/permission.service';
 
 @Injectable()
 export class ProjectService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private permissionService: PermissionService,
+  ) {}
 
-  async getAllProjects({ role, userId }: { role?: UserRole; userId: string }) {
+  async getAllProjects({ role, userId }: { role: string; userId: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_PROJECT',
+    });
     const projects = await this.prisma.project.findMany({
       where:
         role === 'ADMIN'
@@ -44,10 +52,14 @@ export class ProjectService {
     userId,
     id,
   }: {
-    role: UserRole;
+    role: string;
     userId?: string;
     id: string;
   }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_PROJECT',
+    });
     const project = await this.prisma.project.findUnique({
       where: { id },
       include: {
@@ -67,9 +79,19 @@ export class ProjectService {
     return project;
   }
 
-  async getProjectUsers({ role, id }: { role: UserRole; id: string }) {
-    if (role !== 'ADMIN' && role !== 'MANAGER')
-      throw new UnauthorizedException('User not allowed');
+  async getProjectUsers({ role, id }: { role: string; id: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_PROJECT',
+    });
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'CREATE_PROJECT',
+    });
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'UPDATE_PROJECT',
+    });
     const users = await this.prisma.user.findMany({
       where: {
         member_projects: {
@@ -88,10 +110,13 @@ export class ProjectService {
     role,
     body,
   }: {
-    role: UserRole;
+    role: string;
     body: CreateProjectDto;
   }) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not Allowed');
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'CREATE_PROJECT',
+    });
     const { manager_id, members, start_date, end_date, ...rest } = body;
     const memberIds = members.map((id) => ({ id }));
 
@@ -113,12 +138,14 @@ export class ProjectService {
     body,
     projectId,
   }: {
-    role: UserRole;
+    role: string;
     body: UpdateProjectDto;
     projectId: string;
   }) {
-    if (role !== 'ADMIN' && role !== 'MANAGER')
-      throw new UnauthorizedException('Not Allowed');
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'UPDATE_PROJECT',
+    });
 
     const { manager_id, members, start_date, end_date, ...rest } = body;
     const memberIds = members ? members?.map((id) => ({ id })) : null;
@@ -147,8 +174,11 @@ export class ProjectService {
     return 'Project updated';
   }
 
-  async deleteProject({ role, id }: { role: UserRole; id: string }) {
-    if (role !== 'ADMIN') throw new UnauthorizedException('Not Allowed');
+  async deleteProject({ role, id }: { role: string; id: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'DELETE_PROJECT',
+    });
     await this.getProject({ id, role });
     await this.prisma.project.delete({ where: { id } });
     return 'Project deleted';
@@ -162,11 +192,14 @@ export class ProjectService {
   }: {
     id: string;
     body: ChangeProjectStatusDto;
-    role: UserRole;
+    role: string;
     userId: string;
   }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'UPDATE_PROJECT',
+    });
     await this.getProject({ role, id, userId });
-
     await this.prisma.project.update({
       where: { id },
       data: {

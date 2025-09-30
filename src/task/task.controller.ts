@@ -40,8 +40,8 @@ export class TaskController {
   }
 
   @Get('/user/:id')
-  async getUserTasks(@Param('id') userId: string) {
-    return this.taskService.getAllTasks({ userId });
+  async getUserTasks(@Request() req, @Param('id') userId: string) {
+    return this.taskService.getAllTasks({ role: req.user.role, userId });
   }
 
   @Get(':id')

@@ -9,6 +9,6 @@ export class PermissionController {
 
   @Get()
   async getPermissions(@Request() req) {
-    return this.permissionService.getAllPermissions(req.user.role);
+    return this.permissionService.getAllPermissions();
   }
 }

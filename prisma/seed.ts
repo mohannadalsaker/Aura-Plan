@@ -6,11 +6,7 @@ const prisma = new PrismaClient();
 async function main() {
   const allPermissions = Object.values(Permissions) as Permissions[];
   await prisma.role.createMany({
-    data: [
-      { name: 'ADMIN', permissions: allPermissions },
-      { name: 'MANAGER' },
-      { name: 'EMPLOYEE' },
-    ],
+    data: [{ name: 'ADMIN', permissions: allPermissions }, { name: 'MANAGER' }],
     skipDuplicates: true,
   });
 
