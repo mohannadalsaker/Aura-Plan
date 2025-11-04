@@ -11,7 +11,14 @@ export const CommentsPageContent = () => {
     useCommentsTableActions();
 
   return (
-    <Box sx={{ backgroundColor: "#e1fdeeff" }}>
+    <Box
+      sx={{
+        backgroundColor: "#e1fdeeff",
+        height: "100%",
+        width: "100%",
+        overflowY: "auto",
+      }}
+    >
       <CustomDialog
         open={Boolean(openDeleteId)}
         onClose={closeDialog}

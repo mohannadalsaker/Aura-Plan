@@ -1,16 +1,14 @@
 import * as images from "@/config/images";
+import MainButton from "@/shared/components/MainButton";
 import { Box, List, Stack } from "@mui/material";
 import SideBarItem from "../component/SideBarItem";
 import { useSideBarFields } from "../hooks/useSideBarFields";
 import { useSideBarStore } from "../store/useSideBarStore";
-import MainButton from "@/shared/components/MainButton";
-import { removeLsValue } from "@/shared/utils";
-import { useNavigate } from "react-router-dom";
 
 const SideBarFeature = () => {
-  const navigate = useNavigate();
-  const { sideBarData, openedId, handleToggleItemOpen } = useSideBarFields();
-  const { isOpen, close } = useSideBarStore();
+  const { sideBarData, openedId, handleToggleItemOpen, logout } =
+    useSideBarFields();
+  const { isOpen } = useSideBarStore();
 
   return (
     <Stack
@@ -90,11 +88,7 @@ const SideBarFeature = () => {
         >
           <MainButton
             variant="contained"
-            onClick={() => {
-              close();
-              removeLsValue("token");
-              navigate("/auth/login");
-            }}
+            onClick={logout}
             sx={{
               px: 2,
               width: "80%",
@@ -111,14 +105,7 @@ const SideBarFeature = () => {
               typography: "subtitle1",
             }}
           >
-            <>
-              {/* <IconArrowLeftFromArc
-                style={{
-                  marginRight: "8px",
-                }}
-              /> */}
-              Logout
-            </>
+            Logout
           </MainButton>
         </Box>
       </List>

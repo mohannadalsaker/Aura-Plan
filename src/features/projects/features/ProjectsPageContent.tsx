@@ -20,7 +20,7 @@ export const ProjectsPageContent = () => {
   } = useProjectsTableActions();
 
   return (
-    <Stack gap={3}>
+    <Stack gap={3} height={"100%"}>
       <ProjectForm />
       <CustomDialog
         open={Boolean(openDeleteId)}
@@ -35,7 +35,14 @@ export const ProjectsPageContent = () => {
           Add project <Plus size={20} />
         </MainButton>
       </Stack>
-      <Box sx={{ backgroundColor: "#e1fdeeff" }}>
+      <Box
+        sx={{
+          backgroundColor: "#e1fdeeff",
+          height: "100%",
+          width: "100%",
+          overflowY: "auto",
+        }}
+      >
         <MainTable<ProjectTableRow>
           actions={tableActions}
           columns={columns}

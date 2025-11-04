@@ -17,7 +17,7 @@ const UserDetails = () => {
     return <CircularProgress />;
 
   return (
-    <Stack gap={4} p={3} height={"100%"}>
+    <Stack gap={4} p={3} height={"100%"} overflow={"auto"}>
       <Stack gap={3}>
         <Stack direction={"row"} gap={2} alignItems={"flex-end"}>
           <Typography
@@ -35,7 +35,7 @@ const UserDetails = () => {
             Last login: {dayjs(userData?.last_login).format("YYYY-MM-DD")}
           </Typography>
         </Stack>
-        <Stack direction={"row"} gap={2}>
+        <Stack direction={"row"} gap={2} flexWrap={"wrap"}>
           <Stack direction={"row"} gap={1}>
             <Typography
               sx={{
@@ -82,7 +82,6 @@ const UserDetails = () => {
         gap={5}
         alignItems={"stretch"}
         flexGrow={1}
-        overflow={"hidden"}
         sx={{
           flexWrap: {
             xs: "wrap",
