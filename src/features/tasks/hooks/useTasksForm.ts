@@ -13,8 +13,10 @@ import { useEffect } from "react";
 import dayjs from "dayjs";
 import { useGetProjects } from "../api/useGetProjects";
 import { useGetUsers } from "../api/useGetUsers";
+import { useParams } from "react-router-dom";
 
 export const useTaskForm = () => {
+  const { id } = useParams();
   const { data: projects, isFetching: isLoadingProjects } = useGetProjects();
   const { openEditId, closeDrawer } = useDrawerStore();
   const { data: taskData, isFetching: isLoadingTask } = useGetTaskById({
@@ -34,7 +36,7 @@ export const useTaskForm = () => {
       description: "",
       start_date: "",
       end_date: "",
-      project_id: "",
+      project_id: id || "",
       users: [],
     },
   });
@@ -60,15 +62,17 @@ export const useTaskForm = () => {
         description: "",
         start_date: "",
         end_date: "",
-        project_id: "",
+        project_id: id || "",
         users: [],
       });
     }
   }, [openEditId, taskData, reset]);
 
-  const { mutate: updateProject, isPending: isUpdating } =
-    useUpdateTask(openEditId);
-  const { mutate: createProject, isPending: isCreating } = useCreateTask();
+  const { mutate: updateProject, isPending: isUpdating } = useUpdateTask(
+    openEditId,
+    id
+  );
+  const { mutate: createProject, isPending: isCreating } = useCreateTask(id);
 
   const onSubmit: SubmitHandler<TaskFormFields> = (data) => {
     if (openEditId) {

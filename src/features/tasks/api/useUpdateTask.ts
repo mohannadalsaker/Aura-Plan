@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import type { TaskFormFields } from "../validation/TaskFormSchema";
 
-export const useUpdateTask = (id: string | null) => {
+export const useUpdateTask = (id: string | null, projectId?: string) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<
@@ -18,7 +18,9 @@ export const useUpdateTask = (id: string | null) => {
         },
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({
+        queryKey: projectId ? ["task-projects", projectId] : ["tasks"],
+      });
     },
   });
   return mutation;

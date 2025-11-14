@@ -67,7 +67,13 @@ const MainTable = <T extends { id: string }>({
                   <TableCell
                     component={"td"}
                     key={col.key as string}
-                    sx={{ textWrap: "nowrap", typography: "subtitle1" }}
+                    sx={{
+                      textWrap: "nowrap",
+                      typography: "subtitle1",
+                      maxWidth: "200px",
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                    }}
                   >
                     {row[col.key] as string}
                   </TableCell>

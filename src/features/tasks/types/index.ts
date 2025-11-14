@@ -32,9 +32,15 @@ export interface SingleTaskData {
   start_date: string;
   end_date: string;
   creator_id: string;
+  status: TaskStatus;
+  rating: number;
   users: {
     user_id: string;
     task_id: string;
+    user: {
+      id: string;
+      username: string;
+    };
   }[];
   project_id: string;
 }

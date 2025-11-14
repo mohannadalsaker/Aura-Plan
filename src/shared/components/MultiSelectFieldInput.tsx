@@ -117,7 +117,7 @@ export const MultiSelectFieldInput = ({
     );
   };
   return (
-    <Stack>
+    <Stack gap={1}>
       {label && (
         <FormLabel
           sx={{

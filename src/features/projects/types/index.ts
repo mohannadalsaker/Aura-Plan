@@ -1,3 +1,5 @@
+import type { TaskStatus } from "@/features/tasks/types";
+
 interface ProjectManager {
   id: string;
   username: string;
@@ -43,6 +45,40 @@ export interface SingleProjectData {
 export interface MemberData {
   id: string;
   username: string;
+}
+
+export interface ProjectTasksData {
+  id: string;
+  created_at: string;
+  updated_at: string;
+  start_date: string;
+  end_date: string;
+  status: TaskStatus;
+  title: string;
+  creator: {
+    id: string;
+    username: string;
+    email: string;
+  };
+}
+
+export interface TaskCommentsData {
+  id: string;
+  text: string;
+  user: {
+    id: string;
+    username: string;
+    email: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectTasksTableRow {
+  id: string;
+  title: string;
+  status: string;
+  creatorName: string;
 }
 
 export enum ProjectStatus {

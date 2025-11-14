@@ -46,7 +46,6 @@ const TaskForm = () => {
                 {...register("description")}
                 error={Boolean(errors.description?.message)}
                 helperText={errors.description?.message}
-                isRequired={true}
               />
               <TextFieldInput
                 label="Start Date"
@@ -61,7 +60,6 @@ const TaskForm = () => {
                 {...register("end_date")}
                 error={Boolean(errors.end_date?.message)}
                 helperText={errors.end_date?.message}
-                isRequired={true}
                 type="date"
               />
               <SelectFieldInput
