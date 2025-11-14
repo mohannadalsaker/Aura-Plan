@@ -1,7 +1,7 @@
 import CustomDialog from "@/shared/components/CustomDialog";
 import MainButton from "@/shared/components/MainButton";
 import MainTable from "@/shared/components/MainTable";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { Plus } from "lucide-react";
 import { useProjectsTable } from "../hooks/useProjectsTable";
 import { useProjectsTableActions } from "../hooks/useProjectsTableActions";
@@ -30,7 +30,16 @@ export const ProjectsPageContent = () => {
         title="Confirm Delete"
         subtitle="Are you sure you want to delete this project?"
       />
-      <Stack direction={"row"} justifyContent={"flex-end"}>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        gap={2}
+        flexWrap={"wrap"}
+      >
+        <Typography sx={{ typography: "h2", fontWeight: 600 }}>
+          Projects
+        </Typography>
         <MainButton onClick={openDrawerAdd}>
           Add project <Plus size={20} />
         </MainButton>

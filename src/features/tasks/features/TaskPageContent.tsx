@@ -1,6 +1,6 @@
 import MainButton from "@/shared/components/MainButton";
 import MainTable from "@/shared/components/MainTable";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { Plus } from "lucide-react";
 import { useTasksTable } from "../hooks/useTaskTable";
 import type { TaskTableRow } from "../types";
@@ -30,7 +30,16 @@ export const TasksPageContent = () => {
         title="Confirm Delete"
         subtitle="Are you sure you want to delete this task?"
       />
-      <Stack direction={"row"} justifyContent={"flex-end"}>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        gap={2}
+        flexWrap={"wrap"}
+      >
+        <Typography sx={{ typography: "h2", fontWeight: 600 }}>
+          Tasks
+        </Typography>
         <MainButton onClick={openDrawerAdd}>
           Add task <Plus size={20} />
         </MainButton>

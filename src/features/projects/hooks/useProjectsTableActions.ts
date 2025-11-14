@@ -3,8 +3,10 @@ import { useDialogStore } from "@/stores/form/dialog";
 import { useDrawerStore } from "@/stores/form/drawer";
 import { useDeleteProject } from "../api/useDeleteProject";
 import type { ProjectTableRow } from "../types";
+import { useNavigate } from "react-router-dom";
 
 export const useProjectsTableActions = () => {
+  const navigate = useNavigate();
   const { mutate, isPending } = useDeleteProject();
   const { openDeleteId, openDeleteDialog, closeDialog } = useDialogStore();
   const { openDrawerEdit, openDrawerAdd } = useDrawerStore();
@@ -12,7 +14,7 @@ export const useProjectsTableActions = () => {
   const tableActions: MainTableProps<ProjectTableRow>["actions"] = [
     {
       label: "View Details",
-      action: (project) => console.log("View", project.title),
+      action: (project) => navigate(`view/${project.id}`),
     },
     {
       label: "Edit",

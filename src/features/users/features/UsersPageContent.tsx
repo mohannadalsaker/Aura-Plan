@@ -1,6 +1,6 @@
 import MainButton from "@/shared/components/MainButton";
 import MainTable from "@/shared/components/MainTable";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { Plus } from "lucide-react";
 import { useUsersTable } from "../hooks/useUsersTable";
 import type { UserTableRow } from "../types";
@@ -29,7 +29,16 @@ const UsersPageContent = () => {
         title="Confirm Delete"
         subtitle="Are you sure you want to delete this user?"
       />
-      <Stack direction={"row"} justifyContent={"flex-end"}>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        gap={2}
+        flexWrap={"wrap"}
+      >
+        <Typography sx={{ typography: "h2", fontWeight: 600 }}>
+          Users
+        </Typography>
         <MainButton onClick={openDrawerAdd}>
           Add user <Plus size={20} />
         </MainButton>

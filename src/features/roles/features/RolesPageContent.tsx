@@ -1,6 +1,6 @@
 import MainButton from "@/shared/components/MainButton";
 import MainTable from "@/shared/components/MainTable";
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { Plus } from "lucide-react";
 import { useRolesTable } from "../hooks/useRolesTable";
 import type { RoleTableRow } from "../types";
@@ -29,7 +29,16 @@ export const RolesPageContent = () => {
         title="Confirm Delete"
         subtitle="Are you sure you want to delete this role?"
       />
-      <Stack direction={"row"} justifyContent={"flex-end"}>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        gap={2}
+        flexWrap={"wrap"}
+      >
+        <Typography sx={{ typography: "h2", fontWeight: 600 }}>
+          Roles
+        </Typography>
         <MainButton onClick={openDrawerAdd}>
           Add role <Plus size={20} />
         </MainButton>
