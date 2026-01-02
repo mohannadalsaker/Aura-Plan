@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -23,10 +24,11 @@ export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
   @Get()
-  async getAllProjects(@Request() req) {
+  async getAllProjects(@Request() req, @Query() query) {
     return this.projectService.getAllProjects({
       role: req.user.role,
       userId: req.user.id,
+      ...query,
     });
   }
 

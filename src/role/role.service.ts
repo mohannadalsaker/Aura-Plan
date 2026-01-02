@@ -2,12 +2,12 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UserRole } from 'src/user/types';
-import { CreateRoleDto, UpdateRoleDto } from './dto/role.dto';
 import { PermissionService } from 'src/permission/permission.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateRoleDto, UpdateRoleDto } from './dto/role.dto';
+import { PaginationParams } from 'src/shared/types';
+import { buildPaginatedResponse } from 'src/shared/utils';
 
 @Injectable()
 export class RoleService {
@@ -15,6 +15,40 @@ export class RoleService {
     private prisma: PrismaService,
     private permissionService: PermissionService,
   ) {}
+
+  async getRoles({
+    role,
+    pageNumber,
+    pageSize,
+    q = '',
+  }: Partial<PaginationParams> & { role: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_ROLE',
+    });
+    const filterQuery = {
+      ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
+      ...(pageSize ? { take: +pageSize } : {}),
+      where: {
+        name: {
+          contains: q,
+          mode: 'insensitive' as const,
+        },
+      },
+    };
+
+    const roles = await this.prisma.role.findMany({
+      orderBy: { created_at: 'asc' },
+    });
+    const total = await this.prisma.role.count({ ...filterQuery });
+
+    return buildPaginatedResponse({
+      data: roles,
+      total,
+      pageNumber,
+      pageSize,
+    });
+  }
 
   async getRoleById({ role, id }: { role: string; id: string }) {
     await this.permissionService.hasPermission({
@@ -26,19 +60,6 @@ export class RoleService {
     if (!foundRole) throw new NotFoundException('Role not found');
 
     return foundRole;
-  }
-
-  async getRoles(role: string) {
-    await this.permissionService.hasPermission({
-      role,
-      permission: 'READ_ROLE',
-    });
-
-    const roles = await this.prisma.role.findMany({
-      orderBy: { created_at: 'asc' },
-    });
-
-    return roles;
   }
 
   async addRole({ role, body }: { role: string; body: CreateRoleDto }) {

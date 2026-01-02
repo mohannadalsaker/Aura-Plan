@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -18,11 +19,14 @@ export class CommentController {
   constructor(private commentService: CommentService) {}
 
   @Get()
-  async getComments(@Request() req) {
-    return this.commentService.getAllComments({ role: req.user.role });
+  async getComments(@Request() req, @Query() query) {
+    return this.commentService.getAllComments({
+      role: req.user.role,
+      ...query,
+    });
   }
 
-  @Get(':taskId')
+  @Get('task/:taskId')
   async getCommentsByTaskId(@Request() req, @Param('taskId') taskId: string) {
     return this.commentService.getCommentsByTask({
       role: req.user.role,
@@ -31,7 +35,7 @@ export class CommentController {
     });
   }
 
-  @Post(':taskId')
+  @Post('task/:taskId')
   async createComment(
     @Request() req,
     @Body() body: CreateCommentDto,

@@ -1,15 +1,14 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UserRole } from './types';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { PermissionService } from 'src/permission/permission.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { PaginationParams } from 'src/shared/types';
+import { buildPaginatedResponse } from 'src/shared/utils';
 
 @Injectable()
 export class UserService {
@@ -17,6 +16,45 @@ export class UserService {
     private prisma: PrismaService,
     private permissionService: PermissionService,
   ) {}
+
+  async getUsers({
+    role,
+    pageNumber,
+    pageSize,
+    q = '',
+  }: Partial<PaginationParams> & { role: string }) {
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'READ_USER',
+    });
+
+    const filterQuery = {
+      ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
+      ...(pageSize ? { take: +pageSize } : {}),
+      where: {
+        username: {
+          contains: q,
+          mode: 'insensitive' as const,
+        },
+      },
+    };
+
+    const users = await this.prisma.user.findMany({
+      include: { role: { omit: { permissions: true } } },
+      omit: { password: true },
+      orderBy: { created_at: 'asc' },
+      ...filterQuery,
+    });
+
+    const total = await this.prisma.user.count({ ...filterQuery });
+
+    return buildPaginatedResponse({
+      data: users,
+      total,
+      pageNumber,
+      pageSize,
+    });
+  }
 
   async getUserById({ role, id }: { role: string; id: string }) {
     await this.permissionService.hasPermission({
@@ -33,19 +71,6 @@ export class UserService {
     if (!user) throw new NotFoundException('User not found');
 
     return user;
-  }
-
-  async getUsers(role: string) {
-    await this.permissionService.hasPermission({
-      role,
-      permission: 'READ_USER',
-    });
-    const users = await this.prisma.user.findMany({
-      include: { role: { omit: { permissions: true } } },
-      omit: { password: true },
-      orderBy: { created_at: 'asc' },
-    });
-    return users;
   }
 
   async getMemberUsers(role: string) {

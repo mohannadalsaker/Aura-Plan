@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -23,10 +24,11 @@ export class TaskController {
   constructor(private taskService: TaskService) {}
 
   @Get()
-  async getTasks(@Request() req) {
+  async getTasks(@Request() req, @Query() query) {
     return this.taskService.getAllTasks({
       role: req.user.role,
       userId: req.user.id,
+      ...query,
     });
   }
 

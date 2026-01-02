@@ -1,15 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ProjectService } from 'src/project/project.service';
-import { TaskService } from 'src/task/task.service';
-import { UserRole } from 'src/user/types';
-import { CreateCommentDto } from './dto/comment.dto';
-import passport from 'passport';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PermissionService } from 'src/permission/permission.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { TaskService } from 'src/task/task.service';
+import { CreateCommentDto } from './dto/comment.dto';
+import { PaginationParams } from 'src/shared/types';
+import { buildPaginatedResponse } from 'src/shared/utils';
 
 @Injectable()
 export class CommentService {
@@ -19,18 +14,44 @@ export class CommentService {
     private permissionService: PermissionService,
   ) {}
 
-  async getAllComments({ role }: { role: string }) {
+  async getAllComments({
+    role,
+    pageNumber,
+    pageSize,
+    q = '',
+  }: Partial<PaginationParams> & { role: string }) {
     await this.permissionService.hasPermission({
       role,
       permission: 'READ_COMMENT',
     });
+
+    const filterQuery = {
+      ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
+      ...(pageSize ? { take: +pageSize } : {}),
+      where: {
+        text: {
+          contains: q,
+          mode: 'insensitive' as const,
+        },
+      },
+    };
+
     const comments = await this.prisma.comment.findMany({
       include: {
         user: { omit: { password: true } },
         task: { select: { id: true, title: true } },
       },
+      ...filterQuery,
     });
-    return comments;
+
+    const total = await this.prisma.comment.count({ ...filterQuery });
+
+    return buildPaginatedResponse({
+      data: comments,
+      total,
+      pageNumber,
+      pageSize,
+    });
   }
 
   async getCommentsByTask({

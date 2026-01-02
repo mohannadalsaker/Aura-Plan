@@ -3,10 +3,10 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -20,10 +20,11 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('me')
-  async getMe(@Request() req) {
+  async getMe(@Request() req, @Query() query) {
     return this.userService.getUserById({
       id: req.user.id,
       role: 'ADMIN',
+      ...query,
     });
   }
 

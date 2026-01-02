@@ -11,6 +11,8 @@ import {
   UpdateProjectDto,
 } from './dto/project.dto';
 import { PermissionService } from 'src/permission/permission.service';
+import { PaginationParams } from 'src/shared/types';
+import { buildPaginatedResponse } from 'src/shared/utils';
 
 @Injectable()
 export class ProjectService {
@@ -19,21 +21,36 @@ export class ProjectService {
     private permissionService: PermissionService,
   ) {}
 
-  async getAllProjects({ role, userId }: { role: string; userId: string }) {
+  async getAllProjects({
+    role,
+    userId,
+    pageNumber,
+    pageSize,
+    q = '',
+  }: Partial<PaginationParams> & { role: string; userId: string }) {
     await this.permissionService.hasPermission({
       role,
       permission: 'READ_PROJECT',
     });
-    const projects = await this.prisma.project.findMany({
-      where:
-        role === 'ADMIN'
+    const filterQuery = {
+      ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
+      ...(pageSize ? { take: +pageSize } : {}),
+      where: {
+        ...(role === 'ADMIN'
           ? {}
           : {
               OR: [
                 { members: { some: { id: userId } } },
                 { manager_id: userId },
               ],
-            },
+            }),
+        title: {
+          contains: q,
+          mode: 'insensitive' as const,
+        },
+      },
+    };
+    const projects = await this.prisma.project.findMany({
       orderBy: { created_at: 'asc' },
       include: {
         manager: {
@@ -43,8 +60,17 @@ export class ProjectService {
           omit: { password: true, last_login: true },
         },
       },
+      ...filterQuery,
     });
-    return projects;
+
+    const total = await this.prisma.project.count({ ...filterQuery });
+
+    return buildPaginatedResponse({
+      data: projects,
+      total,
+      pageNumber,
+      pageSize,
+    });
   }
 
   async getProject({

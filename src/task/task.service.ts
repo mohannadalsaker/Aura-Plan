@@ -1,29 +1,21 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TaskStatus } from '@prisma/client';
+import { PermissionService } from 'src/permission/permission.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProjectService } from 'src/project/project.service';
-import { UserRole } from 'src/user/types';
+import { PaginationParams } from 'src/shared/types';
+import { buildPaginatedResponse } from 'src/shared/utils';
 import {
   ChangeTaskStatusDto,
   CreateTaskDto,
   UpdateTaskDto,
 } from './dto/task.dto';
-import { RoleService } from 'src/role/role.service';
-import { UserService } from 'src/user/user.service';
-import { PermissionService } from 'src/permission/permission.service';
 
 @Injectable()
 export class TaskService {
   constructor(
     private prisma: PrismaService,
     private projectService: ProjectService,
-    private roleService: RoleService,
-    private userService: UserService,
     private permissionService: PermissionService,
   ) {}
 
@@ -31,7 +23,10 @@ export class TaskService {
     role,
     userId,
     projectId,
-  }: {
+    pageNumber,
+    pageSize,
+    q = '',
+  }: Partial<PaginationParams> & {
     role: string;
     userId: string;
     projectId?: string;
@@ -40,7 +35,9 @@ export class TaskService {
       role,
       permission: 'READ_TASK',
     });
-    const tasks = await this.prisma.task.findMany({
+    const filterQuery = {
+      ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
+      ...(pageSize ? { take: +pageSize } : {}),
       where: {
         ...(projectId ? { project_id: projectId } : {}),
         ...(role === 'ADMIN'
@@ -55,15 +52,30 @@ export class TaskService {
                 },
               ],
             }),
+        title: {
+          contains: q,
+          mode: 'insensitive' as const,
+        },
       },
+    };
+
+    const tasks = await this.prisma.task.findMany({
       orderBy: { created_at: 'asc' },
       include: {
         project: true,
         creator: { omit: { password: true } },
       },
+      ...filterQuery,
     });
 
-    return tasks;
+    const total = await this.prisma.task.count({ ...filterQuery });
+
+    return buildPaginatedResponse({
+      data: tasks,
+      total,
+      pageNumber,
+      pageSize,
+    });
   }
 
   async getTask({
@@ -102,8 +114,16 @@ export class TaskService {
       include: {
         project: true,
         creator: { omit: { password: true } },
-        ...(withComments ? { comments: true } : {}),
-        users: true,
+        ...(withComments
+          ? {
+              comments: {
+                include: {
+                  user: { omit: { password: true, last_login: true } },
+                },
+              },
+            }
+          : {}),
+        users: { include: { user: { select: { id: true, username: true } } } },
       },
     });
     if (!task) throw new NotFoundException('Task not found');

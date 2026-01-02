@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -19,8 +20,8 @@ export class RoleController {
   constructor(private roleService: RoleService) {}
 
   @Get()
-  async getAllRoles(@Request() req) {
-    return this.roleService.getRoles(req.user.role);
+  async getAllRoles(@Request() req, @Query() query) {
+    return this.roleService.getRoles({ role: req.user.role, ...query });
   }
 
   @Get(':id')
