@@ -7,9 +7,19 @@ import type { TaskTableRow } from "../types";
 import TaskForm from "./TaskForm";
 import { useTasksTableActions } from "../hooks/useTasksTableActions";
 import CustomDialog from "@/shared/components/CustomDialog";
+import { TextFieldInput } from "@/shared/components/TextFieldInput";
+import { useQueryParams } from "@/shared/hooks/useQueryParams";
+import TableFooter from "@/shared/components/TableFooter";
 
 export const TasksPageContent = () => {
-  const { rows, columns } = useTasksTable();
+  const {
+    handleChangePageNumber,
+    handleChangePageSize,
+    handleChangeSearch,
+    pageNumber,
+    pageSize,
+  } = useQueryParams();
+  const { rows, columns, total } = useTasksTable();
   const {
     confirmDelete,
     closeDialog,
@@ -40,9 +50,27 @@ export const TasksPageContent = () => {
         <Typography sx={{ typography: "h2", fontWeight: 600 }}>
           Tasks
         </Typography>
-        <MainButton onClick={openDrawerAdd}>
-          Add task <Plus size={20} />
-        </MainButton>
+        <Stack direction={"row"} alignItems={"center"} gap={2}>
+          <TextFieldInput
+            placeholder="Search in tasks"
+            height="42px"
+            onChange={(event) => handleChangeSearch(event.target.value)}
+          />
+          <MainButton onClick={openDrawerAdd}>
+            <Stack
+              direction={"row"}
+              gap={1}
+              px={3}
+              height={"100%"}
+              alignItems={"center"}
+            >
+              <Typography sx={{ typography: "subtitle1", fontWeight: 600 }}>
+                Add task
+              </Typography>
+              <Plus size={20} />
+            </Stack>
+          </MainButton>
+        </Stack>
       </Stack>
       <Box
         sx={{
@@ -58,6 +86,13 @@ export const TasksPageContent = () => {
           rows={rows}
         />
       </Box>
+      <TableFooter
+        pageNumber={+pageNumber}
+        pageSize={+pageSize}
+        total={total || 0}
+        onPageNumberChange={handleChangePageNumber}
+        onPageSizeChange={handleChangePageSize}
+      />
     </Stack>
   );
 };

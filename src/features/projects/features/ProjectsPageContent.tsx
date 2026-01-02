@@ -7,9 +7,19 @@ import { useProjectsTable } from "../hooks/useProjectsTable";
 import { useProjectsTableActions } from "../hooks/useProjectsTableActions";
 import type { ProjectTableRow } from "../types";
 import ProjectForm from "./ProjectForm";
+import { TextFieldInput } from "@/shared/components/TextFieldInput";
+import TableFooter from "@/shared/components/TableFooter";
+import { useQueryParams } from "@/shared/hooks/useQueryParams";
 
 export const ProjectsPageContent = () => {
-  const { rows, columns } = useProjectsTable();
+  const {
+    handleChangePageNumber,
+    handleChangePageSize,
+    handleChangeSearch,
+    pageNumber,
+    pageSize,
+  } = useQueryParams();
+  const { rows, columns, total } = useProjectsTable();
   const {
     confirmDelete,
     closeDialog,
@@ -40,9 +50,27 @@ export const ProjectsPageContent = () => {
         <Typography sx={{ typography: "h2", fontWeight: 600 }}>
           Projects
         </Typography>
-        <MainButton onClick={openDrawerAdd}>
-          Add project <Plus size={20} />
-        </MainButton>
+        <Stack direction={"row"} alignItems={"center"} gap={2}>
+          <TextFieldInput
+            placeholder="Search in projects"
+            height="42px"
+            onChange={(event) => handleChangeSearch(event.target.value)}
+          />
+          <MainButton onClick={openDrawerAdd}>
+            <Stack
+              direction={"row"}
+              gap={1}
+              px={3}
+              height={"100%"}
+              alignItems={"center"}
+            >
+              <Typography sx={{ typography: "subtitle1", fontWeight: 600 }}>
+                Add project
+              </Typography>
+              <Plus size={20} />
+            </Stack>
+          </MainButton>
+        </Stack>
       </Stack>
       <Box
         sx={{
@@ -58,6 +86,13 @@ export const ProjectsPageContent = () => {
           rows={rows}
         />
       </Box>
+      <TableFooter
+        pageNumber={+pageNumber}
+        pageSize={+pageSize}
+        total={total || 0}
+        onPageNumberChange={handleChangePageNumber}
+        onPageSizeChange={handleChangePageSize}
+      />
     </Stack>
   );
 };

@@ -35,10 +35,12 @@ const MainButton = ({
         backgroundImage: "linear-gradient(to bottom right, #3CB371, #1E90FF)",
         color: "#fff",
         fontWeight: "500",
+        height: "42px",
         textTransform: "none",
         typography: "subtitle1",
         display: "flex",
         alignItems: "center",
+        textWrap: "nowrap",
         gap: 1,
         ...sx,
       }}

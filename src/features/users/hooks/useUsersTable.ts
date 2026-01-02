@@ -14,5 +14,7 @@ export const useUsersTable = () => {
     { key: "updatedAt", label: "Updated at" },
   ];
 
-  return { rows: data, columns };
+  const rows = data?.data || [];
+
+  return { rows, columns, total: data?.total };
 };

@@ -4,17 +4,50 @@ import { Box, Stack, Typography } from "@mui/material";
 import type { CommentTableRow } from "../types";
 import { useCommentsTableActions } from "../hooks/useCommentsTableActions";
 import CustomDialog from "@/shared/components/CustomDialog";
+import { useQueryParams } from "@/shared/hooks/useQueryParams";
+import TableFooter from "@/shared/components/TableFooter";
+import { TextFieldInput } from "@/shared/components/TextFieldInput";
 
 export const CommentsPageContent = () => {
-  const { rows, columns } = useCommentsTable();
+  const {
+    handleChangePageNumber,
+    handleChangePageSize,
+    handleChangeSearch,
+    pageNumber,
+    pageSize,
+  } = useQueryParams();
+  const { rows, columns, total } = useCommentsTable();
   const { confirmDelete, closeDialog, isPending, openDeleteId, tableActions } =
     useCommentsTableActions();
 
   return (
     <Stack gap={3} height={"100%"}>
-      <Typography sx={{ typography: "h2", fontWeight: 600 }}>
-        Comments
-      </Typography>
+      <CustomDialog
+        open={Boolean(openDeleteId)}
+        onClose={closeDialog}
+        onConfirm={confirmDelete}
+        loading={isPending}
+        title="Confirm Delete"
+        subtitle="Are you sure you want to delete this comment?"
+      />
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        gap={2}
+        flexWrap={"wrap"}
+      >
+        <Typography sx={{ typography: "h2", fontWeight: 600 }}>
+          Comments
+        </Typography>
+        <Box>
+          <TextFieldInput
+            placeholder="Search in comments"
+            height="42px"
+            onChange={(event) => handleChangeSearch(event.target.value)}
+          />
+        </Box>
+      </Stack>
 
       <Box
         sx={{
@@ -24,21 +57,19 @@ export const CommentsPageContent = () => {
           overflowY: "auto",
         }}
       >
-        <CustomDialog
-          open={Boolean(openDeleteId)}
-          onClose={closeDialog}
-          onConfirm={confirmDelete}
-          loading={isPending}
-          title="Confirm Delete"
-          subtitle="Are you sure you want to delete this comment?"
-        />
-
         <MainTable<CommentTableRow>
           actions={tableActions}
           columns={columns}
           rows={rows}
         />
       </Box>
+      <TableFooter
+        pageNumber={+pageNumber}
+        pageSize={+pageSize}
+        total={total || 0}
+        onPageNumberChange={handleChangePageNumber}
+        onPageSizeChange={handleChangePageSize}
+      />
     </Stack>
   );
 };

@@ -24,7 +24,7 @@ interface SelectFieldProps {
   label?: string;
   placeholder?: string;
   error?: string | boolean;
-  options?: { value: string; label: string }[];
+  options?: { value: string | number; label: string }[];
   isRequired?: boolean;
   disabled?: boolean;
   isLoading?: boolean;
@@ -36,7 +36,7 @@ interface SelectFieldProps {
     value,
     label,
   }: {
-    value: string;
+    value: string | number;
     label: string;
   }) => ReactNode;
 }
