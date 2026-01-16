@@ -67,3 +67,8 @@ export class ChangeTaskStatusDto {
   @IsNotEmpty()
   status: TaskStatus;
 }
+
+export class RateTaskDto {
+  @IsNotEmpty()
+  rating: number;
+}

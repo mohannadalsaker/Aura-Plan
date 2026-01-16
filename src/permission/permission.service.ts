@@ -2,12 +2,9 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Permissions } from '@prisma/client';
-import { NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { RoleService } from 'src/role/role.service';
 
 @Injectable()
 export class PermissionService {

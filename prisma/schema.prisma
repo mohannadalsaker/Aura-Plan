@@ -40,7 +40,7 @@ model Task {
   start_date  DateTime
   end_date    DateTime?
   status      TaskStatus    @default(TODO)
-  rating      Int?
+  rating      Float?
   creator_id  String         @db.Uuid
   creator     User           @relation("TaskCreator", fields: [creator_id], references: [id], onDelete: Cascade)
   users       TasksOnUsers[]
@@ -112,6 +112,7 @@ enum ProjectStatus {
   COMPLETED
   PLANNING
   ON_HOLD
+  REVIEW
 }
 
 enum TaskStatus {
@@ -125,26 +126,32 @@ enum TaskStatus {
 enum Permissions {
   // PROJECT
   CREATE_PROJECT
+  READ_ALL_PROJECTS
   READ_PROJECT
   UPDATE_PROJECT
   DELETE_PROJECT
   // TASK
   CREATE_TASK
+  READ_ALL_TASKS
   READ_TASK
   UPDATE_TASK
   DELETE_TASK
+  RATE_TASK
   // USER
   CREATE_USER
+  READ_ALL_USER
   READ_USER
   UPDATE_USER
   DELETE_USER
   // ROLE
   CREATE_ROLE
+  READ_ALL_ROLES
   READ_ROLE
   UPDATE_ROLE
   DELETE_ROLE
   // COMMENT
   CREATE_COMMENT
+  READ_ALL_COMMENTS
   READ_COMMENT
   UPDATE_COMMENT
   DELETE_COMMENT

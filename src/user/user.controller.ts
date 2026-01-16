@@ -29,8 +29,8 @@ export class UserController {
   }
 
   @Get()
-  async getAllUsers(@Request() req) {
-    return this.userService.getUsers(req.user.role);
+  async getAllUsers(@Request() req, @Query() query) {
+    return this.userService.getUsers({ role: req.user.role, ...query });
   }
 
   @Get('managers')

@@ -14,6 +14,7 @@ import { TaskService } from './task.service';
 import {
   ChangeTaskStatusDto,
   CreateTaskDto,
+  RateTaskDto,
   UpdateTaskDto,
 } from './dto/task.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -71,6 +72,20 @@ export class TaskController {
     @Body() body: ChangeTaskStatusDto,
   ) {
     return this.taskService.changeStatus({
+      role: req.user.role,
+      body,
+      userId: req.user.id,
+      id,
+    });
+  }
+
+  @Post('rate/:id')
+  async rateTask(
+    @Request() req,
+    @Param('id') id: string,
+    @Body() body: RateTaskDto,
+  ) {
+    return this.taskService.rateTask({
       role: req.user.role,
       body,
       userId: req.user.id,

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TaskStatus } from '@prisma/client';
 import { PermissionService } from 'src/permission/permission.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,6 +12,7 @@ import { buildPaginatedResponse } from 'src/shared/utils';
 import {
   ChangeTaskStatusDto,
   CreateTaskDto,
+  RateTaskDto,
   UpdateTaskDto,
 } from './dto/task.dto';
 
@@ -253,5 +258,37 @@ export class TaskService {
       },
     });
     return 'Task status updated';
+  }
+
+  async rateTask({
+    id,
+    role,
+    body,
+    userId,
+  }: {
+    id: string;
+    role: string;
+    userId: string;
+    body: RateTaskDto;
+  }) {
+    await this.getTask({ role, taskId: id, userId });
+
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'RATE_TASK',
+    });
+
+    if (!body.rating) {
+      throw new BadRequestException('value is required');
+    }
+
+    await this.prisma.task.update({
+      where: { id },
+      data: {
+        rating: Number(body.rating),
+      },
+    });
+
+    return 'Task rated successfully';
   }
 }
