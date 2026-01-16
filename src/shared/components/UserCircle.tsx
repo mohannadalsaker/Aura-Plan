@@ -1,6 +1,14 @@
-import { Stack, Typography } from "@mui/material";
+import { Stack, Typography, type SxProps } from "@mui/material";
 
-const UserCircle = ({ name, size }: { name: string; size?: string }) => {
+const UserCircle = ({
+  name,
+  size,
+  sx,
+}: {
+  name: string;
+  size?: string;
+  sx?: SxProps;
+}) => {
   return (
     <Stack
       justifyContent={"center"}
@@ -11,6 +19,7 @@ const UserCircle = ({ name, size }: { name: string; size?: string }) => {
         backgroundColor: "#ccc",
         width: size || "50px",
         height: size || "50px",
+        ...sx,
       }}
     >
       <Typography sx={{ typography: "subtitle1" }}>

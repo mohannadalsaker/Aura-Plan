@@ -84,6 +84,7 @@ export interface ProjectTasksTableRow {
 export enum ProjectStatus {
   ACTIVE = "ACTIVE",
   COMPLETED = "COMPLETED",
+  REVIEW = "REVIEW",
   PLANNING = "PLANNING",
   ON_HOLD = "ON_HOLD",
 }

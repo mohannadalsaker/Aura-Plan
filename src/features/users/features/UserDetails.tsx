@@ -1,9 +1,18 @@
-import { CircularProgress, Divider, Stack, Typography } from "@mui/material";
+import {
+  CircularProgress,
+  Divider,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import dayjs from "dayjs";
 import UserDataCard from "../components/UserDataCard";
 import { useUserDetails } from "../hooks/useUserDetails";
+import { ArrowLeftIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const UserDetails = () => {
+  const navigate = useNavigate();
   const {
     isLoadingProjects,
     isLoadingTasks,
@@ -17,9 +26,12 @@ const UserDetails = () => {
     return <CircularProgress />;
 
   return (
-    <Stack gap={4} p={3} height={"100%"} overflow={"auto"}>
+    <Stack gap={4} p={2} height={"100%"} overflow={"auto"}>
       <Stack gap={3}>
         <Stack direction={"row"} gap={2} alignItems={"flex-end"}>
+          <IconButton onClick={() => navigate("/users")}>
+            <ArrowLeftIcon />
+          </IconButton>
           <Typography
             sx={{ typography: "h4", fontWeight: 600, color: "text.primary" }}
           >

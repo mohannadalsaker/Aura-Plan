@@ -34,6 +34,12 @@ export interface SingleTaskData {
   creator_id: string;
   status: TaskStatus;
   rating: number;
+  creator: {
+    id: string;
+    username: string;
+  };
+  updated_at: string;
+  created_at: string;
   users: {
     user_id: string;
     task_id: string;

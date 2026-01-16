@@ -22,7 +22,7 @@ export const RolesPageContent = () => {
   const { rows, columns, total } = useRolesTable();
   const {
     confirmDelete,
-    closeDialog,
+    closeDeleteDialog,
     openDrawerAdd,
     isPending,
     openDeleteId,
@@ -33,7 +33,7 @@ export const RolesPageContent = () => {
       <RoleForm />
       <CustomDialog
         open={Boolean(openDeleteId)}
-        onClose={closeDialog}
+        onClose={closeDeleteDialog}
         onConfirm={confirmDelete}
         loading={isPending}
         title="Confirm Delete"

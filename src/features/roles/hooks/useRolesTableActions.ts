@@ -6,7 +6,8 @@ import type { RoleTableRow } from "../types";
 
 export const useRolesTableActions = () => {
   const { mutate, isPending } = useDeleteRole();
-  const { openDeleteId, openDeleteDialog, closeDialog } = useDialogStore();
+  const { openDeleteId, openDeleteDialog, closeDeleteDialog } =
+    useDialogStore();
   const { openDrawerEdit, openDrawerAdd } = useDrawerStore();
 
   const tableActions: MainTableProps<RoleTableRow>["actions"] = [
@@ -27,7 +28,7 @@ export const useRolesTableActions = () => {
   const confirmDelete = () => {
     mutate(openDeleteId, {
       onSuccess: () => {
-        closeDialog();
+        closeDeleteDialog();
       },
     });
   };
@@ -37,7 +38,7 @@ export const useRolesTableActions = () => {
     isPending,
     openDeleteId,
     confirmDelete,
-    closeDialog,
+    closeDeleteDialog,
     openDrawerAdd,
   };
 };

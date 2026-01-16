@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 export const useUsersTableActions = () => {
   const navigate = useNavigate();
   const { mutate, isPending } = useDeleteUser();
-  const { openDeleteId, openDeleteDialog, closeDialog } = useDialogStore();
+  const { openDeleteId, openDeleteDialog, closeDeleteDialog } =
+    useDialogStore();
   const { openDrawerEdit, openDrawerAdd } = useDrawerStore();
 
   const tableActions: MainTableProps<UserTableRow>["actions"] = [
@@ -35,7 +36,7 @@ export const useUsersTableActions = () => {
   const confirmDelete = () => {
     mutate(openDeleteId, {
       onSuccess: () => {
-        closeDialog();
+        closeDeleteDialog();
       },
     });
   };
@@ -45,7 +46,7 @@ export const useUsersTableActions = () => {
     isPending,
     openDeleteId,
     confirmDelete,
-    closeDialog,
+    closeDeleteDialog,
     openDrawerAdd,
   };
 };

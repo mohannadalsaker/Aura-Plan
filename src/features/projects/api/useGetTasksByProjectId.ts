@@ -1,18 +1,18 @@
 import { fetcher } from "@/api/fetcher";
-import { type ApiResponse } from "@/shared/types";
+import { type ApiPagingatedResponse } from "@/shared/types";
 import { useQuery } from "@tanstack/react-query";
 import type { ProjectTasksData, ProjectTasksTableRow } from "../types";
 
 export const useGetTasksByProjectId = ({ id }: { id: string }) => {
   const query = useQuery<
-    ApiResponse<ProjectTasksData>,
+    ApiPagingatedResponse<ProjectTasksData>,
     Error,
     ProjectTasksTableRow[]
   >({
     queryKey: ["task-projects", id],
     queryFn: () => fetcher(`/tasks/project/${id}`),
     select: (response) => {
-      const data = response.data.map((task) => ({
+      const data = response.data.data.map((task) => ({
         id: task.id,
         status: task.status,
         creatorName: task.creator.username,

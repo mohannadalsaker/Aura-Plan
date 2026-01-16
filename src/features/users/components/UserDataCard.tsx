@@ -24,25 +24,31 @@ const UserDataCard = ({ data, pathPrefix, title }: UserDataCardProps) => {
         {title}
       </Typography>
       <Stack gap={1} overflow={"auto"}>
-        {data.map((ele) => (
-          <Stack
-            direction={"row"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-            sx={{ backgroundColor: "#fff", borderRadius: "6px", p: 1 }}
-          >
-            <Typography
-              sx={{
-                typography: "subtitle1",
-              }}
+        {data?.length > 0 ? (
+          data?.map((ele) => (
+            <Stack
+              direction={"row"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+              sx={{ backgroundColor: "#fff", borderRadius: "6px", p: 1 }}
             >
-              {ele.name}
-            </Typography>
-            <IconButton onClick={() => navigate(`${pathPrefix}/${ele.id}`)}>
-              <SquareArrowOutUpRight />
-            </IconButton>
-          </Stack>
-        ))}
+              <Typography
+                sx={{
+                  typography: "subtitle1",
+                }}
+              >
+                {ele.name}
+              </Typography>
+              <IconButton onClick={() => navigate(`${pathPrefix}/${ele.id}`)}>
+                <SquareArrowOutUpRight />
+              </IconButton>
+            </Stack>
+          ))
+        ) : (
+          <Typography sx={{ typography: "subtitle1", color: "text.primary" }}>
+            There is no data
+          </Typography>
+        )}
       </Stack>
     </Stack>
   );

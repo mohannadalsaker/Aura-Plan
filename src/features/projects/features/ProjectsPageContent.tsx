@@ -22,11 +22,16 @@ export const ProjectsPageContent = () => {
   const { rows, columns, total } = useProjectsTable();
   const {
     confirmDelete,
-    closeDialog,
+    closeDeleteDialog,
     openDrawerAdd,
-    isPending,
+    closeChangeStatusDialog,
+    confirmChangeStatus,
+    isChangingStatus,
+    openChangeStatusId,
+    isDeleting,
     openDeleteId,
     tableActions,
+    newStatus,
   } = useProjectsTableActions();
 
   return (
@@ -34,11 +39,19 @@ export const ProjectsPageContent = () => {
       <ProjectForm />
       <CustomDialog
         open={Boolean(openDeleteId)}
-        onClose={closeDialog}
+        onClose={closeDeleteDialog}
         onConfirm={confirmDelete}
-        loading={isPending}
+        loading={isDeleting}
         title="Confirm Delete"
         subtitle="Are you sure you want to delete this project?"
+      />
+      <CustomDialog
+        open={Boolean(openChangeStatusId)}
+        onClose={closeChangeStatusDialog}
+        onConfirm={confirmChangeStatus}
+        loading={isChangingStatus}
+        title="Confirm Change Status"
+        subtitle={`Are you sure you want to change the status of this project to ${newStatus}?`}
       />
       <Stack
         direction={"row"}

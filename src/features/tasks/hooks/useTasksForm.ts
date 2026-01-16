@@ -29,6 +29,7 @@ export const useTaskForm = () => {
     reset,
     control,
     watch,
+    setValue,
   } = useForm<TaskFormFields>({
     resolver: zodResolver(TaskFormSchema),
     defaultValues: {
@@ -96,6 +97,7 @@ export const useTaskForm = () => {
   return {
     register,
     sendForm,
+    setValue,
     isCreating,
     isUpdating,
     errors,

@@ -6,7 +6,8 @@ import type { CommentTableRow } from "../types";
 
 export const useCommentsTableActions = () => {
   const { mutate, isPending } = useDeleteComment();
-  const { openDeleteId, openDeleteDialog, closeDialog } = useDialogStore();
+  const { openDeleteId, openDeleteDialog, closeDeleteDialog } =
+    useDialogStore();
   const { openDrawerAdd } = useDrawerStore();
 
   const tableActions: MainTableProps<CommentTableRow>["actions"] = [
@@ -21,7 +22,7 @@ export const useCommentsTableActions = () => {
   const confirmDelete = () => {
     mutate(openDeleteId, {
       onSuccess: () => {
-        closeDialog();
+        closeDeleteDialog();
       },
     });
   };
@@ -31,7 +32,7 @@ export const useCommentsTableActions = () => {
     isPending,
     openDeleteId,
     confirmDelete,
-    closeDialog,
+    closeDeleteDialog,
     openDrawerAdd,
   };
 };

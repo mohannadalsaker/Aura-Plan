@@ -17,14 +17,19 @@ export const CommentsPageContent = () => {
     pageSize,
   } = useQueryParams();
   const { rows, columns, total } = useCommentsTable();
-  const { confirmDelete, closeDialog, isPending, openDeleteId, tableActions } =
-    useCommentsTableActions();
+  const {
+    confirmDelete,
+    closeDeleteDialog,
+    isPending,
+    openDeleteId,
+    tableActions,
+  } = useCommentsTableActions();
 
   return (
     <Stack gap={3} height={"100%"}>
       <CustomDialog
         open={Boolean(openDeleteId)}
-        onClose={closeDialog}
+        onClose={closeDeleteDialog}
         onConfirm={confirmDelete}
         loading={isPending}
         title="Confirm Delete"

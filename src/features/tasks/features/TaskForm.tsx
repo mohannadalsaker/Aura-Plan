@@ -6,16 +6,20 @@ import { SelectFieldInput } from "@/shared/components/SelectFieldInput";
 import { TextFieldInput } from "@/shared/components/TextFieldInput";
 import { useDrawerStore } from "@/stores/form/drawer";
 import { Stack } from "@mui/material";
+import { useLocation } from "react-router-dom";
 import { useTaskForm } from "../hooks/useTasksForm";
 
 const TaskForm = () => {
+  const { pathname } = useLocation();
+
   const { openAdd, openEditId, closeDrawer } = useDrawerStore();
   const {
     register,
+    sendForm,
+    setValue,
     errors,
     isCreating,
     isUpdating,
-    sendForm,
     control,
     projects,
     users,
@@ -62,15 +66,20 @@ const TaskForm = () => {
                 helperText={errors.end_date?.message}
                 type="date"
               />
-              <SelectFieldInput
-                label="Project"
-                name="project_id"
-                control={control}
-                error={errors.project_id?.message}
-                isLoading={isLoadingProjects}
-                isRequired={true}
-                options={projects}
-              />
+              {!pathname.includes("projects") && (
+                <SelectFieldInput
+                  label="Project"
+                  name="project_id"
+                  control={control}
+                  error={errors.project_id?.message}
+                  isLoading={isLoadingProjects}
+                  isRequired={true}
+                  options={projects}
+                  onChange={() => {
+                    setValue("users", []);
+                  }}
+                />
+              )}
               <MultiSelectFieldInput
                 label="Users"
                 name="users"

@@ -34,7 +34,7 @@ const ProjectDetails = () => {
     isLoadingTasks,
   } = useProjectDetails();
   const { openDrawerAdd } = useDrawerStore();
-  const { openDeleteId, closeDialog } = useDialogStore();
+  const { openDeleteId, closeDeleteDialog } = useDialogStore();
   const theme = useTheme();
   const isMediumUp = useMediaQuery(theme.breakpoints.up("md"));
 
@@ -43,7 +43,7 @@ const ProjectDetails = () => {
       <TaskForm />
       <CustomDialog
         open={Boolean(openDeleteId)}
-        onClose={closeDialog}
+        onClose={closeDeleteDialog}
         onConfirm={confirmDelete}
         loading={isDeleting}
         title="Confirm Delete"

@@ -22,11 +22,16 @@ export const TasksPageContent = () => {
   const { rows, columns, total } = useTasksTable();
   const {
     confirmDelete,
-    closeDialog,
+    closeDeleteDialog,
     openDrawerAdd,
-    isPending,
+    confirmChangeStatus,
+    closeChangeStatusDialog,
+    isDeleting,
     openDeleteId,
     tableActions,
+    isChangingStatus,
+    openChangeStatusId,
+    newStatus,
   } = useTasksTableActions();
 
   return (
@@ -34,11 +39,19 @@ export const TasksPageContent = () => {
       <TaskForm />
       <CustomDialog
         open={Boolean(openDeleteId)}
-        onClose={closeDialog}
+        onClose={closeDeleteDialog}
         onConfirm={confirmDelete}
-        loading={isPending}
+        loading={isDeleting}
         title="Confirm Delete"
         subtitle="Are you sure you want to delete this task?"
+      />
+      <CustomDialog
+        open={Boolean(openChangeStatusId)}
+        onClose={closeChangeStatusDialog}
+        onConfirm={confirmChangeStatus}
+        loading={isChangingStatus}
+        title="Confirm Change Status"
+        subtitle={`Are you sure you want to change the status of this task to ${newStatus}?`}
       />
       <Stack
         direction={"row"}

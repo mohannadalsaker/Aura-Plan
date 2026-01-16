@@ -22,7 +22,7 @@ const UsersPageContent = () => {
   const { rows, columns, total } = useUsersTable();
   const {
     confirmDelete,
-    closeDialog,
+    closeDeleteDialog,
     openDrawerAdd,
     isPending,
     openDeleteId,
@@ -33,7 +33,7 @@ const UsersPageContent = () => {
       <UserForm />
       <CustomDialog
         open={Boolean(openDeleteId)}
-        onClose={closeDialog}
+        onClose={closeDeleteDialog}
         onConfirm={confirmDelete}
         loading={isPending}
         title="Confirm Delete"

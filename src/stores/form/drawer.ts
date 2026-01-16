@@ -5,6 +5,7 @@ interface DrawerStore {
   openEditId: string | null;
   openDrawerAdd: () => void;
   openDrawerEdit: (id: string) => void;
+
   closeDrawer: () => void;
 }
 

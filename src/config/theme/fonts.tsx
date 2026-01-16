@@ -5,19 +5,19 @@ export const fonts = {
   fontSize: 12,
   h1: {
     fontFamily: MAIN_FONT,
-    fontSize: 48,
+    fontSize: 32,
   },
   h2: {
     fontFamily: MAIN_FONT,
-    fontSize: 40,
+    fontSize: 30,
   },
   h3: {
     fontFamily: MAIN_FONT,
-    fontSize: 32,
+    fontSize: 28,
   },
   h4: {
     fontFamily: MAIN_FONT,
-    fontSize: 28,
+    fontSize: 26,
   },
   h5: {
     fontFamily: MAIN_FONT,
@@ -25,15 +25,15 @@ export const fonts = {
   },
   h6: {
     fontFamily: MAIN_FONT,
-    fontSize: 21,
+    fontSize: 22,
   },
   body1: {
     fontFamily: MAIN_FONT,
-    fontSize: 19,
+    fontSize: 20,
   },
   body2: {
     fontFamily: MAIN_FONT,
-    fontSize: 15,
+    fontSize: 18,
   },
   subtitle1: {
     fontFamily: MAIN_FONT,
@@ -41,6 +41,6 @@ export const fonts = {
   },
   subtitle2: {
     fontFamily: MAIN_FONT,
-    fontSize: 13,
+    fontSize: 14,
   },
 };
