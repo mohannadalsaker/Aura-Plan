@@ -1,18 +1,17 @@
 import {
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
+import { PermissionService } from 'src/permission/permission.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserRole } from 'src/user/types';
+import { PaginationParams } from 'src/shared/types';
+import { buildPaginatedResponse } from 'src/shared/utils';
 import {
   ChangeProjectStatusDto,
   CreateProjectDto,
   UpdateProjectDto,
 } from './dto/project.dto';
-import { PermissionService } from 'src/permission/permission.service';
-import { PaginationParams } from 'src/shared/types';
-import { buildPaginatedResponse } from 'src/shared/utils';
 
 @Injectable()
 export class ProjectService {
@@ -30,7 +29,7 @@ export class ProjectService {
   }: Partial<PaginationParams> & { role: string; userId: string }) {
     await this.permissionService.hasPermission({
       role,
-      permission: 'READ_PROJECT',
+      permission: 'READ_ALL_PROJECTS',
     });
     const filterQuery = {
       ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
@@ -99,9 +98,7 @@ export class ProjectService {
       project.members.some((mem) => mem.id === userId) ||
       project.manager_id === userId;
 
-    if (!isAdmin && !isMember)
-      throw new UnauthorizedException('User not allowed');
-
+    if (!isAdmin && !isMember) throw new ForbiddenException('User not allowed');
     return project;
   }
 
@@ -223,15 +220,26 @@ export class ProjectService {
   }) {
     await this.permissionService.hasPermission({
       role,
-      permission: 'UPDATE_PROJECT',
+      permission: 'CHANGE_PROJECT_STATUS',
     });
-    await this.getProject({ role, id, userId });
-    await this.prisma.project.update({
-      where: { id },
-      data: {
-        status: body.status,
-      },
-    });
+    const oldProject = await this.getProject({ role, id, userId });
+
+    await this.prisma.$transaction([
+      this.prisma.project.update({
+        where: { id },
+        data: {
+          status: body.status,
+        },
+      }),
+      this.prisma.projectStatusHistory.create({
+        data: {
+          project_id: id,
+          new_status: body.status,
+          old_status: oldProject.status,
+        },
+      }),
+    ]);
+
     return 'Project status updated';
   }
 }

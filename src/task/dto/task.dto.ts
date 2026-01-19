@@ -2,6 +2,7 @@ import { TaskStatus } from '@prisma/client';
 import {
   IsArray,
   IsDateString,
+  IsDefined,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -11,7 +12,8 @@ import {
 
 export class CreateTaskDto {
   @IsString()
-  @IsNotEmpty()
+  @IsDefined({ message: 'title is required' })
+  @IsNotEmpty({ message: 'title should not be empty' })
   title: string;
 
   @IsString()
@@ -19,7 +21,8 @@ export class CreateTaskDto {
   description?: string;
 
   @IsDateString()
-  @IsNotEmpty()
+  @IsDefined({ message: 'start_date is required' })
+  @IsNotEmpty({ message: 'start_date should not be empty' })
   start_date: string;
 
   @IsDateString()
@@ -27,11 +30,13 @@ export class CreateTaskDto {
   end_date?: string;
 
   @IsArray()
-  @IsUUID(undefined, { each: true })
+  @IsDefined({ message: 'users are required' })
+  @IsUUID(undefined, { each: true, message: 'each user must be a valid UUID' })
   users: string[];
 
   @IsUUID()
-  @IsNotEmpty()
+  @IsDefined({ message: 'project_id is required' })
+  @IsNotEmpty({ message: 'project_id should not be empty' })
   project_id: string;
 }
 
@@ -53,7 +58,7 @@ export class UpdateTaskDto {
   end_date?: string;
 
   @IsArray()
-  @IsUUID(undefined, { each: true })
+  @IsUUID(undefined, { each: true, message: 'each user must be a valid UUID' })
   @IsOptional()
   users: string[];
 
@@ -63,12 +68,16 @@ export class UpdateTaskDto {
 }
 
 export class ChangeTaskStatusDto {
-  @IsEnum(TaskStatus)
-  @IsNotEmpty()
+  @IsEnum(TaskStatus, {
+    message: 'status must be a valid TaskStatus enum value',
+  })
+  @IsDefined({ message: 'status is required' })
+  @IsNotEmpty({ message: 'status should not be empty' })
   status: TaskStatus;
 }
 
 export class RateTaskDto {
-  @IsNotEmpty()
+  @IsDefined({ message: 'rating is required' })
+  @IsNotEmpty({ message: 'rating should not be empty' })
   rating: number;
 }

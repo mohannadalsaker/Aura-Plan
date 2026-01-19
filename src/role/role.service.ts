@@ -24,7 +24,7 @@ export class RoleService {
   }: Partial<PaginationParams> & { role: string }) {
     await this.permissionService.hasPermission({
       role,
-      permission: 'READ_ROLE',
+      permission: 'READ_ALL_ROLES',
     });
     const filterQuery = {
       ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
@@ -101,6 +101,6 @@ export class RoleService {
       throw new ForbiddenException("Role 'ADMIN' cannot be deleted");
 
     await this.prisma.role.delete({ where: { id: roleId } });
-    return { message: 'Role deleted' };
+    return 'Role deleted';
   }
 }

@@ -1,7 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsDefined, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateCommentDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'text must be a string' })
+  @IsDefined({ message: 'text is required' })
+  @IsNotEmpty({ message: 'text should not be empty' })
   text: string;
 }

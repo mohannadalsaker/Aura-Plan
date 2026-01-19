@@ -22,7 +22,7 @@ export class CommentService {
   }: Partial<PaginationParams> & { role: string }) {
     await this.permissionService.hasPermission({
       role,
-      permission: 'READ_COMMENT',
+      permission: 'READ_ALL_COMMENTS',
     });
 
     const filterQuery = {

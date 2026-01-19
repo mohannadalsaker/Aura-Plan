@@ -38,7 +38,7 @@ export class TaskService {
   }) {
     await this.permissionService.hasPermission({
       role,
-      permission: 'READ_TASK',
+      permission: 'READ_ALL_TASKS',
     });
     const filterQuery = {
       ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
@@ -168,6 +168,7 @@ export class TaskService {
         creator: { connect: { id: userId } },
       },
     });
+    return 'Task created';
   }
 
   async updateTask({
@@ -226,6 +227,7 @@ export class TaskService {
         },
       }),
     ]);
+    return 'Task updated';
   }
 
   async deleteTask({ role, id }: { role: string; id: string }) {
@@ -249,14 +251,28 @@ export class TaskService {
     role: string;
     userId: string;
   }) {
-    await this.getTask({ role, taskId: id, userId });
-
-    await this.prisma.task.update({
-      where: { id },
-      data: {
-        status: body.status,
-      },
+    const oldTask = await this.getTask({ role, taskId: id, userId });
+    await this.permissionService.hasPermission({
+      role,
+      permission: 'CHANGE_TASK_STATUS',
     });
+
+    await this.prisma.$transaction([
+      this.prisma.task.update({
+        where: { id },
+        data: {
+          status: body.status,
+        },
+      }),
+      this.prisma.taskStatusHistory.create({
+        data: {
+          task_id: id,
+          old_status: oldTask.status,
+          new_status: body.status,
+        },
+      }),
+    ]);
+
     return 'Task status updated';
   }
 

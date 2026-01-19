@@ -54,6 +54,7 @@ model Task {
   @@index([project_id])
   @@index([status])
   @@index([start_date])
+  taskStatusHistories TaskStatusHistory[]
 }
 
 model TasksOnUsers {
@@ -85,6 +86,7 @@ model Project {
   @@index([manager_id])
   @@index([status])
   @@index([start_date])
+  projectStatusHistories ProjectStatusHistory[]
 }
 
 model Comment {
@@ -106,6 +108,31 @@ model Role {
   users       User[]
   permissions Permissions[] @default([])
 }
+
+model TaskStatusHistory {
+  id         String      @id @default(uuid(7)) @db.Uuid
+  task_id    String      @db.Uuid
+  old_status TaskStatus
+  new_status TaskStatus
+  changed_at DateTime    @default(now())
+
+  task Task @relation(fields: [task_id], references: [id], onDelete: Cascade)
+
+  @@index([task_id])
+  @@index([changed_at])
+  @@index([new_status])
+}
+
+model ProjectStatusHistory {
+  id         String         @id @default(uuid(7)) @db.Uuid
+  project_id String         @db.Uuid
+  old_status ProjectStatus
+  new_status ProjectStatus
+  changed_at DateTime       @default(now())
+
+  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)
+}
+
 
 enum ProjectStatus {
   ACTIVE
@@ -130,6 +157,7 @@ enum Permissions {
   READ_PROJECT
   UPDATE_PROJECT
   DELETE_PROJECT
+  CHANGE_PROJECT_STATUS
   // TASK
   CREATE_TASK
   READ_ALL_TASKS
@@ -137,9 +165,10 @@ enum Permissions {
   UPDATE_TASK
   DELETE_TASK
   RATE_TASK
+  CHANGE_TASK_STATUS
   // USER
   CREATE_USER
-  READ_ALL_USER
+  READ_ALL_USERS
   READ_USER
   UPDATE_USER
   DELETE_USER

@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDateString,
   IsEnum,
+  IsDefined,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -11,7 +12,8 @@ import {
 
 export class CreateProjectDto {
   @IsString()
-  @IsNotEmpty()
+  @IsDefined({ message: 'title is required' })
+  @IsNotEmpty({ message: 'title should not be empty' })
   title: string;
 
   @IsString()
@@ -19,22 +21,32 @@ export class CreateProjectDto {
   description?: string;
 
   @IsDateString()
-  @IsNotEmpty()
+  @IsDefined({ message: 'start_date is required' })
+  @IsNotEmpty({ message: 'start_date should not be empty' })
   start_date: string;
 
   @IsDateString()
   @IsOptional()
   end_date?: string;
 
-  @IsEnum(ProjectStatus)
+  @IsEnum(ProjectStatus, {
+    message: 'status must be a valid ProjectStatus enum value',
+  })
+  @IsDefined({ message: 'status is required' })
+  @IsNotEmpty({ message: 'status should not be empty' })
   status: ProjectStatus;
 
   @IsUUID()
-  @IsNotEmpty()
+  @IsDefined({ message: 'manager_id is required' })
+  @IsNotEmpty({ message: 'manager_id should not be empty' })
   manager_id: string;
 
-  @IsArray()
-  @IsUUID(undefined, { each: true })
+  @IsArray({ message: 'members must be an array' })
+  @IsDefined({ message: 'members are required' })
+  @IsUUID(undefined, {
+    each: true,
+    message: 'each member must be a valid UUID',
+  })
   members: string[];
 }
 
@@ -55,7 +67,9 @@ export class UpdateProjectDto {
   @IsOptional()
   end_date?: string;
 
-  @IsEnum(ProjectStatus)
+  @IsEnum(ProjectStatus, {
+    message: 'status must be a valid ProjectStatus enum value',
+  })
   @IsOptional()
   status?: ProjectStatus;
 
@@ -63,14 +77,20 @@ export class UpdateProjectDto {
   @IsOptional()
   manager_id?: string;
 
-  @IsArray()
-  @IsUUID(undefined, { each: true })
+  @IsArray({ message: 'members must be an array' })
+  @IsUUID(undefined, {
+    each: true,
+    message: 'each member must be a valid UUID',
+  })
   @IsOptional()
   members?: string[];
 }
 
 export class ChangeProjectStatusDto {
-  @IsEnum(ProjectStatus)
-  @IsNotEmpty()
+  @IsEnum(ProjectStatus, {
+    message: 'status must be a valid ProjectStatus enum value',
+  })
+  @IsDefined({ message: 'status is required' })
+  @IsNotEmpty({ message: 'status should not be empty' })
   status: ProjectStatus;
 }

@@ -25,7 +25,7 @@ export class UserService {
   }: Partial<PaginationParams> & { role: string }) {
     await this.permissionService.hasPermission({
       role,
-      permission: 'READ_USER',
+      permission: 'READ_ALL_USERS',
     });
 
     const filterQuery = {

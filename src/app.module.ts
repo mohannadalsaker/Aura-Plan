@@ -9,9 +9,10 @@ import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
 import { CommentModule } from './comment/comment.module';
 import { PermissionModule } from './permission/permission.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, UserModule, RoleModule, ProjectModule, TaskModule, CommentModule, PermissionModule],
+  imports: [AuthModule, PrismaModule, UserModule, RoleModule, ProjectModule, TaskModule, CommentModule, PermissionModule, AnalyticsModule],
   controllers: [AppController],
   providers: [AppService],
 })

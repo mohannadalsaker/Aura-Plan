@@ -18,13 +18,28 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : 'Internal server error';
+    let message = 'Internal server error';
+
+    if (exception instanceof HttpException) {
+      const exceptionResponse = exception.getResponse();
+
+      if (typeof exceptionResponse === 'string') {
+        message = exceptionResponse;
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
+        if ('message' in exceptionResponse) {
+          const msg = exceptionResponse.message;
+          message = Array.isArray(msg)
+            ? msg[0] || 'Validation error'
+            : String(msg);
+        }
+      }
+    }
 
     response.status(status).json({
-      success: false,
+      success: status < 400,
       message,
       timestamp: new Date().toISOString(),
       path: request.url,

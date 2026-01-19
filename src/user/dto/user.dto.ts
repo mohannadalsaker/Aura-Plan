@@ -1,45 +1,50 @@
 import {
   IsEmail,
-  IsEnum,
+  IsDefined,
   IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
 
 export class CreateUserDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'email must be a valid email address' })
+  @IsDefined({ message: 'email is required' })
+  @IsNotEmpty({ message: 'email should not be empty' })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'username must be a string' })
+  @IsDefined({ message: 'username is required' })
+  @IsNotEmpty({ message: 'username should not be empty' })
   username: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'password must be a string' })
+  @IsDefined({ message: 'password is required' })
+  @IsNotEmpty({ message: 'password should not be empty' })
   password: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'role_id must be a string' })
+  @IsDefined({ message: 'role_id is required' })
+  @IsNotEmpty({ message: 'role_id should not be empty' })
   role_id: string;
 }
 
 export class UpdateUserDto {
-  @IsEmail()
+  @IsEmail({}, { message: 'email must be a valid email address' })
   @IsOptional()
   email?: string;
 
-  @IsString()
+  @IsString({ message: 'username must be a string' })
   @IsOptional()
   username?: string;
 
-  @IsString()
+  @IsString({ message: 'role_id must be a string' })
   @IsOptional()
   role_id?: string;
 }
 
 export class ChangePasswordDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: 'password must be a string' })
+  @IsDefined({ message: 'password is required' })
+  @IsNotEmpty({ message: 'password should not be empty' })
   password: string;
 }
