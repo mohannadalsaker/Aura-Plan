@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "public"."Task" ALTER COLUMN "rating" SET DATA TYPE DOUBLE PRECISION;

@@ -1,0 +1,8 @@
+export enum DashboardRange {
+  TODAY = 'TODAY',
+  LAST_7_DAYS = 'LAST_7_DAYS',
+  LAST_30_DAYS = 'LAST_30_DAYS',
+  THIS_MONTH = 'THIS_MONTH',
+  THIS_YEAR = 'THIS_YEAR',
+  ALL_TIME = 'ALL_TIME',
+}
