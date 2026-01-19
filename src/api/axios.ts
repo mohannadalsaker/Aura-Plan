@@ -1,5 +1,7 @@
-import { getLsValue } from "@/shared/utils";
-import axios from "axios";
+import type { ErrorResponse } from "@/shared/types";
+import { getLsValue, removeLsValue } from "@/shared/utils";
+import { useSnackBarStore } from "@/stores/modules/snackbar/snackbar";
+import axios, { AxiosError } from "axios";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:3000/",
@@ -15,17 +17,20 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// axiosInstance.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     const status = error.response?.status;
-
-//     // if (status === 401 || status === 403) {
-//     //   removeLsValue("token");
-//     //   window.location.assign("/auth/login");
-//     // }
-//     return Promise.reject(error);
-//   }
-// );
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError<ErrorResponse>) => {
+    const { openSnackBar } = useSnackBarStore.getState();
+    openSnackBar({
+      message: error.response?.data?.message || "An error has occured",
+      type: "error",
+    });
+    if (error.status === 401) {
+      removeLsValue("token");
+      window.location.assign("/auth/login");
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default axiosInstance;

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import type { LoginResponse } from "../types";
 import type { LoginFormFields } from "../validation/LoginFormSchema";
+import { successRequestSnackbar } from "@/shared/utils/requestSnackbar";
 
 export const useLoginApi = () => {
   const queryClient = useQueryClient();
@@ -20,6 +21,7 @@ export const useLoginApi = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      successRequestSnackbar("Login success.");
     },
   });
   return mutation;

@@ -1,10 +1,11 @@
 import { post } from "@/api/mutator";
+import { successRequestSnackbar } from "@/shared/utils/requestSnackbar";
 import { useMutation } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 
 export const useAddCommentToTask = () => {
   const mutation = useMutation<
-    object,
+    {data: string},
     AxiosError<{ error: string }>,
     {
       data: { text: string };
@@ -23,6 +24,9 @@ export const useAddCommentToTask = () => {
           "Content-Type": "application/json",
         },
       }),
+    onSuccess: (res) => {
+      successRequestSnackbar(res.data);
+    },
   });
   return mutation;
 };

@@ -2,12 +2,13 @@ import { patch } from "@/api/mutator";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import type { UserFormFields } from "../validation/UserFormSchema";
+import { successRequestSnackbar } from "@/shared/utils/requestSnackbar";
 
 export const useUpdateUser = (id: string | null) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<
-    {},
+    { data: string },
     AxiosError<{ error: string }>,
     UserFormFields
   >({
@@ -17,8 +18,9 @@ export const useUpdateUser = (id: string | null) => {
           "Content-Type": "application/json",
         },
       }),
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      successRequestSnackbar(res.data);
     },
   });
   return mutation;

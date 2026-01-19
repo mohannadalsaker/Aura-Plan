@@ -27,3 +27,9 @@ export interface QueryParams {
   pageSize: number;
   q: string;
 }
+
+export interface ErrorResponse {
+  message: string;
+  success: boolean;
+  path: string;
+}

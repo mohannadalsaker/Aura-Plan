@@ -21,7 +21,7 @@ export const useProjectForm = () => {
   const { data: projectData, isFetching: isLoadingProject } = useGetProjectById(
     {
       id: openEditId!,
-    }
+    },
   );
   const {
     register,
