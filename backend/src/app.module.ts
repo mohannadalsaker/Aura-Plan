@@ -10,9 +10,23 @@ import { TaskModule } from './task/task.module';
 import { CommentModule } from './comment/comment.module';
 import { PermissionModule } from './permission/permission.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, PrismaModule, UserModule, RoleModule, ProjectModule, TaskModule, CommentModule, PermissionModule, AnalyticsModule],
+  imports: [
+    AuthModule,
+    PrismaModule,
+    UserModule,
+    RoleModule,
+    ProjectModule,
+    TaskModule,
+    CommentModule,
+    PermissionModule,
+    AnalyticsModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
