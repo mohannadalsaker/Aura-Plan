@@ -12,14 +12,15 @@ export const useProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { changeTaskId, taskId } = useProjectDetailsStore();
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask(id);
-  const { openDeleteId, openDeleteDialog, closeDialog } = useDialogStore();
+  const { openDeleteId, openDeleteDialog, closeDeleteDialog } =
+    useDialogStore();
   const { openDrawerEdit } = useDrawerStore();
 
   const { data: projectData, isLoading: isLoadingProject } = useGetProjectById({
     id: id!,
   });
   const { data: tasksData, isLoading: isLoadingTasks } = useGetTasksByProjectId(
-    { id: id! }
+    { id: id! },
   );
 
   const columns: MainTableProps<ProjectTasksTableRow>["columns"] = [
@@ -60,7 +61,7 @@ export const useProjectDetails = () => {
   const confirmDelete = () => {
     deleteTask(openDeleteId, {
       onSuccess: () => {
-        closeDialog();
+        closeDeleteDialog();
       },
     });
   };

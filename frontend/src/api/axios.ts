@@ -4,7 +4,7 @@ import { useSnackBarStore } from "@/stores/modules/snackbar/snackbar";
 import axios, { AxiosError } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: import.meta.env.VITE_SUPABASE_URL,
   timeout: 10000,
 });
 
@@ -14,6 +14,8 @@ axiosInstance.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   config.headers["ngrok-skip-browser-warning"] = "true";
+  config.headers["apiKey"] =
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
   return config;
 });
 
@@ -27,7 +29,7 @@ axiosInstance.interceptors.response.use(
     });
     if (error.status === 401) {
       removeLsValue("token");
-      window.location.assign("/auth/login");
+      // window.location.assign("/auth/login");
     }
     return Promise.reject(error);
   },

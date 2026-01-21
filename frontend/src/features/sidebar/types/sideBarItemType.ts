@@ -1,5 +1,4 @@
 // import { IconType } from "@/shared";
-import type { ReactElement } from "react";
 import type { MuiStyles, NavLinkStyles } from "./mui";
 
 export interface SideBarItemType {
