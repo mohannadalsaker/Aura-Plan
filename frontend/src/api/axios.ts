@@ -4,8 +4,8 @@ import { useSnackBarStore } from "@/stores/modules/snackbar/snackbar";
 import axios, { AxiosError } from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000",
-  // baseURL: import.meta.env.VITE_BACKEND_URL,
+  // baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   timeout: 10000,
 });
 
