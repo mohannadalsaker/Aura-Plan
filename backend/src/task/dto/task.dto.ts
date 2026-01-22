@@ -60,11 +60,11 @@ export class UpdateTaskDto {
   @IsArray()
   @IsUUID(undefined, { each: true, message: 'each user must be a valid UUID' })
   @IsOptional()
-  users: string[];
+  users?: string[];
 
   @IsUUID()
   @IsOptional()
-  project_id: string;
+  project_id?: string;
 }
 
 export class ChangeTaskStatusDto {

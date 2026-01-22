@@ -188,15 +188,17 @@ export class TaskService {
     });
 
     const { project_id, users, start_date, end_date, ...rest } = body;
-    await this.projectService.getProject({ role, userId, id: project_id });
+    if (project_id)
+      await this.projectService.getProject({ role, userId, id: project_id });
 
     const current = await this.prisma.tasksOnUsers.findMany({
       where: { task_id: taskId },
       select: { user_id: true },
     });
 
-    const currentIds = new Set(current.map((c) => c.user_id));
-    const incomingIds = new Set(users as string[]);
+    const currentIds = new Set<string>(current.map((c) => c.user_id));
+
+    const incomingIds = new Set<string>(users ?? []);
 
     const toDelete = [...currentIds].filter((id) => !incomingIds.has(id));
     const toAdd = [...incomingIds].filter((id) => !currentIds.has(id));
