@@ -196,7 +196,7 @@ export class TaskService {
     });
 
     const currentIds = new Set(current.map((c) => c.user_id));
-    const incomingIds = new Set(users);
+    const incomingIds = new Set(users as string[]);
 
     const toDelete = [...currentIds].filter((id) => !incomingIds.has(id));
     const toAdd = [...incomingIds].filter((id) => !currentIds.has(id));
