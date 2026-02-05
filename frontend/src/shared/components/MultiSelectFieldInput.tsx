@@ -17,7 +17,7 @@ interface MultiSelectFieldInputProps {
   defaultValue?: (string | number)[];
   onChange?: (
     event: SelectChangeEvent<(string | number)[]>,
-    child: React.ReactNode
+    child: React.ReactNode,
   ) => void;
   register?: UseFormRegisterReturn<string>;
   label?: string;
@@ -47,7 +47,7 @@ export const MultiSelectFieldInput = ({
 }: MultiSelectFieldInputProps) => {
   const renderSelect = (
     controlledValue?: (string | number)[],
-    controlledOnChange?: any
+    controlledOnChange?: any,
   ) => {
     return (
       <Select

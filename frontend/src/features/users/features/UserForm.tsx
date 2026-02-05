@@ -47,7 +47,7 @@ const UserForm = () => {
                 helperText={errors.email?.message}
                 isRequired={true}
               />
-              {data?.data?.role?.name !== "ADMIN" ? null : (
+              {data?.data?.user?.role?.name !== "ADMIN" ? null : (
                 <TextFieldInput
                   label="Password"
                   {...register("password")}

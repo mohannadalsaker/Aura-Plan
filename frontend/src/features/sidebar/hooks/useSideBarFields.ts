@@ -30,7 +30,7 @@ export const useSideBarFields = () => {
         return id;
       });
     },
-    []
+    [],
   );
 
   const sideBarData: SideBarItemProps["item"][] = [
@@ -38,42 +38,36 @@ export const useSideBarFields = () => {
       id: 0,
       name: "Dashboard",
       route: "/",
-      isNormale: true,
       hasChildren: false,
     },
     {
       id: 1,
       name: "Projects",
       route: "/projects",
-      isNormale: true,
       hasChildren: false,
     },
     {
       id: 2,
       name: "Tasks",
       route: "/tasks",
-      isNormale: true,
       hasChildren: false,
     },
     {
       id: 3,
       name: "Users",
       route: "/users",
-      isNormale: true,
       hasChildren: false,
     },
     {
       id: 4,
       name: "Roles",
       route: "/roles",
-      isNormale: true,
       hasChildren: false,
     },
     {
       id: 5,
       name: "Comments",
       route: "/comments",
-      isNormale: true,
       hasChildren: false,
     },
   ];
