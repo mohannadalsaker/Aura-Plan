@@ -2,6 +2,8 @@ import { Line } from "react-chartjs-2";
 import { getStatusStyles } from "@/shared/utils/getStatusStyles";
 import { useGetTasksStatistics } from "../api/useGetTasksStatistics";
 import type { TaskStatus } from "@/features/tasks/types";
+import Loader from "@/shared/components/Loader";
+import { Stack, Typography } from "@mui/material";
 
 const STATUSES = [
   "todo",
@@ -14,7 +16,7 @@ const STATUSES = [
 const TasksSection = () => {
   const { data, isLoading } = useGetTasksStatistics();
 
-  if (isLoading) return null;
+  if (isLoading) return <Loader />;
 
   const labels = data?.data?.map((d) => d.date);
 
@@ -31,7 +33,7 @@ const TasksSection = () => {
     };
   });
 
-  return (
+  return data && data?.data?.length > 0 ? (
     <Line
       key={"tasks_stats"}
       data={{ labels, datasets }}
@@ -52,6 +54,23 @@ const TasksSection = () => {
         },
       }}
     />
+  ) : (
+    <Stack
+      justifyContent={"center"}
+      alignItems={"center"}
+      height={"100%"}
+      px={1}
+    >
+      <Typography
+        sx={{
+          typography: "h6",
+          fontWeight: 500,
+          textAlign: "center",
+        }}
+      >
+        There are no tasks yet
+      </Typography>
+    </Stack>
   );
 };
 

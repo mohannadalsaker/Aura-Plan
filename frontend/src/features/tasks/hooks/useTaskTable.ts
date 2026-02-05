@@ -3,7 +3,7 @@ import { useGetTasks } from "../api/useGetTasks";
 import type { TaskTableRow } from "../types";
 
 export const useTasksTable = () => {
-  const { data } = useGetTasks();
+  const { data, isLoading } = useGetTasks();
 
   const columns: MainTableProps<TaskTableRow>["columns"] = [
     { key: "title", label: "Task Title" },
@@ -15,5 +15,5 @@ export const useTasksTable = () => {
 
   const rows = data?.data || [];
 
-  return { rows, columns, total: data?.total };
+  return { rows, columns, total: data?.total, isLoading };
 };

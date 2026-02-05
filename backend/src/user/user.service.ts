@@ -9,12 +9,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { PaginationParams } from 'src/shared/types';
 import { buildPaginatedResponse } from 'src/shared/utils';
+import { ProjectService } from 'src/project/project.service';
+import { TaskService } from 'src/task/task.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private prisma: PrismaService,
     private permissionService: PermissionService,
+    private projectService: ProjectService,
+    private taskService: TaskService,
   ) {}
 
   async getUsers({
@@ -54,6 +58,27 @@ export class UserService {
       pageNumber,
       pageSize,
     });
+  }
+
+  async getUserProfile({ role, id }: { role: string; id: string }) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      omit: {
+        password: true,
+      },
+      include: { role: { omit: { permissions: true } } },
+    });
+    if (!user) throw new NotFoundException('Profile not found');
+    const userTasks = await this.taskService.getAllTasks({
+      role,
+      userId: id,
+    });
+    const userProjects = await this.projectService.getAllProjects({
+      role,
+      userId: id,
+    });
+
+    return { user, projects: userProjects.data, tasks: userTasks.data };
   }
 
   async getUserById({ role, id }: { role: string; id: string }) {

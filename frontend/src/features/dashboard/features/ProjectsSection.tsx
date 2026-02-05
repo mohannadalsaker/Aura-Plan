@@ -1,23 +1,24 @@
 import { Pie } from "react-chartjs-2";
 import { useGetProjectsStatistics } from "../api/useGetProjectsStatistics";
 import { getStatusStyles } from "@/shared/utils/getStatusStyles";
-
+import Loader from "@/shared/components/Loader";
+import { Stack, Typography } from "@mui/material";
 
 const ProjectsSection = () => {
   const { data, isLoading } = useGetProjectsStatistics();
 
-  if (isLoading) return null;
+  if (isLoading) return <Loader />;
 
   const labels = data?.data?.map((item) => item.status);
 
   const counts = data?.data?.map((item) => item._count._all);
 
   const backgroundColors = labels?.map(
-    (status) => getStatusStyles(status).backgroundColor || "#cbd5e1"
+    (status) => getStatusStyles(status).backgroundColor || "#cbd5e1",
   );
 
   const chartData = {
-    labels: labels,
+    labels,
     datasets: [
       {
         data: counts,
@@ -28,9 +29,9 @@ const ProjectsSection = () => {
     ],
   };
 
-  return (
+  return data && data?.data?.length ? (
     <Pie
-    key={'projects_stats'}
+      key={"projects_stats"}
       data={chartData}
       options={{
         responsive: true,
@@ -43,13 +44,26 @@ const ProjectsSection = () => {
               padding: 20,
             },
           },
-          title: {
-            display: true,
-            text: "Project Status Distribution",
-          },
         },
       }}
     />
+  ) : (
+    <Stack
+      justifyContent={"center"}
+      alignItems={"center"}
+      height={"100%"}
+      px={1}
+    >
+      <Typography
+        sx={{
+          typography: "h6",
+          fontWeight: 500,
+          textAlign: "center",
+        }}
+      >
+        There are no projects yet
+      </Typography>
+    </Stack>
   );
 };
 

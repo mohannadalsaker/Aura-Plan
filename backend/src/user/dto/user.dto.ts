@@ -37,6 +37,10 @@ export class UpdateUserDto {
   @IsOptional()
   username?: string;
 
+  @IsString({ message: 'password must be a string' })
+  @IsOptional()
+  password: string;
+
   @IsString({ message: 'role_id must be a string' })
   @IsOptional()
   role_id?: string;

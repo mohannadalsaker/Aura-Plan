@@ -10,6 +10,7 @@ import DetailsCard from "../components/DetailsCard";
 import UserCircle from "@/shared/components/UserCircle";
 import dayjs from "dayjs";
 import React from "react";
+import Loader from "@/shared/components/Loader";
 
 const TaskDetailsPageContent = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,7 +18,7 @@ const TaskDetailsPageContent = () => {
   const { data, rate, isRating, isPending } = useTaskDetails();
   const { openDrawerEdit } = useDrawerStore();
 
-  if (isPending) return null;
+  if (isPending) return <Loader />;
 
   return (
     <Stack gap={4} p={2} height={"100%"} overflow={"auto"}>

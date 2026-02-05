@@ -5,9 +5,8 @@ import SideBarItem from "../component/SideBarItem";
 import { useSideBarFields } from "../hooks/useSideBarFields";
 import { useSideBarStore } from "../store/useSideBarStore";
 
-const SideBarFeature = () => {
-  const { sideBarData, openedId, handleToggleItemOpen, logout } =
-    useSideBarFields();
+const SideBarFeature = ({ isDrawer = false }: { isDrawer?: boolean }) => {
+  const { sideBarData, openedId, logout } = useSideBarFields();
   const { isOpen } = useSideBarStore();
 
   return (
@@ -74,7 +73,7 @@ const SideBarFeature = () => {
                 key={item.id}
                 item={item}
                 openedId={openedId}
-                toggleOpen={handleToggleItemOpen}
+                isDrawer={isDrawer}
               />
             );
           })}

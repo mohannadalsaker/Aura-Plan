@@ -1,24 +1,16 @@
-import Loader from "@/shared/components/Loader";
 import { Divider, IconButton, Stack, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { ArrowLeftIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import UserDataCard from "../components/UserDataCard";
-import { useUserDetails } from "../hooks/useUserDetails";
+import { useGetProfile } from "../api/useGetProfile";
+import Loader from "@/shared/components/Loader";
+import { useNavigate } from "react-router-dom";
 
-const UserDetails = () => {
+const UserProfile = () => {
   const navigate = useNavigate();
-  const {
-    isLoadingProjects,
-    isLoadingTasks,
-    isLoadingUser,
-    userData,
-    userProjects,
-    userTasks,
-  } = useUserDetails();
+  const { data, isLoading } = useGetProfile();
 
-  if (isLoadingProjects || isLoadingTasks || isLoadingUser) return <Loader />;
-
+  if (isLoading) return <Loader />;
   return (
     <Stack gap={4} p={2} height={"100%"} overflow={"auto"}>
       <Stack gap={3}>
@@ -28,13 +20,13 @@ const UserDetails = () => {
           alignItems={"flex-end"}
           flexWrap={"wrap"}
         >
-          <IconButton onClick={() => navigate("/users")}>
+          <IconButton onClick={() => navigate("/")}>
             <ArrowLeftIcon />
           </IconButton>
           <Typography
             sx={{ typography: "h4", fontWeight: 600, color: "text.primary" }}
           >
-            {userData?.username}
+            {data?.data?.user?.username}
           </Typography>
           <Typography
             sx={{
@@ -43,7 +35,8 @@ const UserDetails = () => {
               color: "secondary.light",
             }}
           >
-            Last login: {dayjs(userData?.last_login).format("YYYY-MM-DD")}
+            Last login:{" "}
+            {dayjs(data?.data?.user?.last_login).format("YYYY-MM-DD")}
           </Typography>
         </Stack>
         <Stack direction={"row"} gap={2} flexWrap={"wrap"}>
@@ -63,7 +56,7 @@ const UserDetails = () => {
                 color: "text.primary",
               }}
             >
-              {userData?.email}
+              {data?.data?.user?.email}
             </Typography>
           </Stack>
           <Stack direction={"row"} gap={1}>
@@ -82,7 +75,7 @@ const UserDetails = () => {
                 color: "text.primary",
               }}
             >
-              {userData?.role.name}
+              {data?.data?.user?.role.name}
             </Typography>
           </Stack>
         </Stack>
@@ -103,16 +96,16 @@ const UserDetails = () => {
         <UserDataCard
           title="Projects"
           pathPrefix="/projects/view"
-          data={userProjects!}
+          data={data?.data?.projects!}
         />
         <UserDataCard
           title="Tasks"
           pathPrefix="/tasks/view"
-          data={userTasks!}
+          data={data?.data?.tasks!}
         />
       </Stack>
     </Stack>
   );
 };
 
-export default UserDetails;
+export default UserProfile;

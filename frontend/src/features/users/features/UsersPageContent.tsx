@@ -19,7 +19,7 @@ const UsersPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total } = useUsersTable();
+  const { rows, columns, total, isLoading } = useUsersTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -49,7 +49,17 @@ const UsersPageContent = () => {
         <Typography sx={{ typography: "h2", fontWeight: 600 }}>
           Users
         </Typography>
-        <Stack direction={"row"} alignItems={"center"} gap={2}>
+        <Stack
+          direction={"row"}
+          alignItems={"center"}
+          gap={2}
+          sx={{
+            flexWrap: {
+              xs: "wrap",
+              sm: "nowrap",
+            },
+          }}
+        >
           <TextFieldInput
             placeholder="Search in users"
             height="42px"
@@ -83,6 +93,7 @@ const UsersPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows!}
+          loading={isLoading}
         />
       </Box>
       <TableFooter

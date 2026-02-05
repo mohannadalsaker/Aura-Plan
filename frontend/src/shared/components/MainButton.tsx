@@ -21,6 +21,7 @@ const MainButton = ({
   return (
     <Button
       loading={isLoading}
+      disabled={isLoading}
       type={type || "button"}
       onClick={
         onClick

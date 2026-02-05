@@ -6,8 +6,10 @@ import { TextFieldInput } from "@/shared/components/TextFieldInput";
 import { useDrawerStore } from "@/stores/form/drawer";
 import { Stack } from "@mui/material";
 import { useUsersForm } from "../hooks/useUsersForm";
+import { useGetProfile } from "../api/useGetProfile";
 
 const UserForm = () => {
+  const { data, isLoading: isLoadingProfile } = useGetProfile();
   const { openAdd, openEditId, closeDrawer } = useDrawerStore();
   const {
     register,
@@ -22,7 +24,10 @@ const UserForm = () => {
   } = useUsersForm();
 
   return (
-    <CustomDrawer open={openAdd || Boolean(openEditId)} loading={isLoadingUser}>
+    <CustomDrawer
+      open={openAdd || Boolean(openEditId)}
+      loading={isLoadingUser || isLoadingProfile}
+    >
       <Stack gap={3}>
         <DrawerHeader title={openEditId ? "Edit User" : "Add User"} />
         <form onSubmit={sendForm}>
@@ -42,13 +47,13 @@ const UserForm = () => {
                 helperText={errors.email?.message}
                 isRequired={true}
               />
-              {openEditId ? null : (
+              {data?.data?.role?.name !== "ADMIN" ? null : (
                 <TextFieldInput
                   label="Password"
                   {...register("password")}
                   type="password"
                   error={Boolean(errors.password?.message)}
-                  isRequired={true}
+                  isRequired={Boolean(openAdd)}
                   helperText={errors.password?.message}
                 />
               )}

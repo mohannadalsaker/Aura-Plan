@@ -3,7 +3,7 @@ import { useGetRoles } from "../api/useGetRoles";
 import type { RoleTableRow } from "../types";
 
 export const useRolesTable = () => {
-  const { data } = useGetRoles();
+  const { data, isLoading } = useGetRoles();
   const columns: MainTableProps<RoleTableRow>["columns"] = [
     { key: "name", label: "Role Name" },
     { key: "createdAt", label: "Created at" },
@@ -12,5 +12,5 @@ export const useRolesTable = () => {
 
   const rows = data?.data || [];
 
-  return { rows, columns, total: data?.total };
+  return { rows, columns, total: data?.total, isLoading };
 };

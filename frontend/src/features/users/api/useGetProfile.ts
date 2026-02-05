@@ -1,13 +1,11 @@
 import { fetcher } from "@/api/fetcher";
+import type { UserResponseData } from "@/features/navbar/types";
 import { useQuery } from "@tanstack/react-query";
-import { type UserResponseData } from "../types";
-import { getLsValue } from "@/shared/utils";
 
-export const useNavbarApi = () => {
+export const useGetProfile = () => {
   const query = useQuery<{ data: UserResponseData }>({
     queryKey: ["user"],
     queryFn: () => fetcher("/users/me"),
-    enabled: !!getLsValue("token"),
   });
   return query;
 };

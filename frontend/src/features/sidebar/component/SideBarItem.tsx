@@ -1,8 +1,14 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import type { SideBarItemProps } from "../types/sideBarItemType";
+import { useSideBarStore } from "../store/useSideBarStore";
 
-const SideBarItem = ({ item, openedId }: SideBarItemProps) => {
+const SideBarItem = ({
+  item,
+  openedId,
+  isDrawer = false,
+}: SideBarItemProps) => {
+  const { close } = useSideBarStore();
   const isItemActive = (props: { isActive?: boolean; id?: number }) => {
     const { isActive, id } = props;
     return (
@@ -42,19 +48,6 @@ const SideBarItem = ({ item, openedId }: SideBarItemProps) => {
         alignItems="center"
         justifyContent={"space-between"}
       >
-        {/* {isItemActive({ isActive }) ? (
-          <item.darkIcon
-            color={isDarkMode ? "#fff" : "#70434A"}
-            stroke="1.7"
-            size={"30px"}
-          />
-        ) : (
-          <item.lightIcon
-            color={isDarkMode ? "#fff" : "#39383A"}
-            stroke="1.7"
-            size={"30px"}
-          />
-        )} */}
         <Typography
           sx={{
             typography: "body1",
@@ -68,15 +61,6 @@ const SideBarItem = ({ item, openedId }: SideBarItemProps) => {
         >
           {item.name}
         </Typography>
-        {/* {hasChildren && (
-          <icons.IconChevronDown
-            style={{
-              transform: isItemActive({ isActive }) ? "rotate(180deg)" : "",
-              color: mode === "dark" ? "white" : "black",
-              transition: "all .3s",
-            }}
-          />
-        )} */}
       </Stack>
     </Stack>
   );
@@ -85,6 +69,9 @@ const SideBarItem = ({ item, openedId }: SideBarItemProps) => {
     <Box component="li" sx={{ width: "100%" }}>
       <NavLink
         to={item.route!}
+        onClick={() => {
+          if (isDrawer) close();
+        }}
         style={({ isActive }) => ({
           textDecoration: "none",
           display: "flex",

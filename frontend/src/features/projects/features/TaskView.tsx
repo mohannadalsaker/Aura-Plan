@@ -1,20 +1,13 @@
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useTaskView } from "../hooks/useTaskView";
+import Loader from "@/shared/components/Loader";
+import { IconButton, Stack, Typography } from "@mui/material";
 import { X } from "lucide-react";
+import { useTaskView } from "../hooks/useTaskView";
 import TaskCommentsSection from "./TaskCommentsSection";
 
 const TaskView = () => {
   const { taskData, isLoadingTask, closeView } = useTaskView();
   return isLoadingTask ? (
-    <Box sx={{ textAlign: "center", padding: 2 }}>
-      <CircularProgress />
-    </Box>
+    <Loader />
   ) : (
     <Stack gap={2} height={"100%"} overflow={"auto"}>
       <Stack

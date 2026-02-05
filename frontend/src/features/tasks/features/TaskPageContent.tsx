@@ -19,7 +19,7 @@ export const TasksPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total } = useTasksTable();
+  const { rows, columns, total, isLoading } = useTasksTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -63,7 +63,17 @@ export const TasksPageContent = () => {
         <Typography sx={{ typography: "h2", fontWeight: 600 }}>
           Tasks
         </Typography>
-        <Stack direction={"row"} alignItems={"center"} gap={2}>
+        <Stack
+          direction={"row"}
+          alignItems={"center"}
+          gap={2}
+          sx={{
+            flexWrap: {
+              xs: "wrap",
+              sm: "nowrap",
+            },
+          }}
+        >
           <TextFieldInput
             placeholder="Search in tasks"
             height="42px"
@@ -97,6 +107,7 @@ export const TasksPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows}
+          loading={isLoading}
         />
       </Box>
       <TableFooter

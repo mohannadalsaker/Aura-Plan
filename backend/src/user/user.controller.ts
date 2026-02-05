@@ -21,9 +21,9 @@ export class UserController {
 
   @Get('me')
   async getMe(@Request() req, @Query() query) {
-    return this.userService.getUserById({
+    return this.userService.getUserProfile({
       id: req.user.id,
-      role: 'ADMIN',
+      role: req.user.role,
       ...query,
     });
   }

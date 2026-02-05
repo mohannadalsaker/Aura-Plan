@@ -1,24 +1,23 @@
+import TaskForm from "@/features/tasks/features/TaskForm";
+import CustomDialog from "@/shared/components/CustomDialog";
+import { CustomDrawer } from "@/shared/components/CustomDrawer";
+import MainButton from "@/shared/components/MainButton";
+import MainTable from "@/shared/components/MainTable";
+import { useDialogStore } from "@/stores/form/dialog";
+import { useDrawerStore } from "@/stores/form/drawer";
 import {
   Box,
-  CircularProgress,
   IconButton,
   Stack,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from "@mui/material";
-import { useProjectDetails } from "../hooks/useProjectDetails";
-import MainButton from "@/shared/components/MainButton";
-import TaskForm from "@/features/tasks/features/TaskForm";
-import { useDrawerStore } from "@/stores/form/drawer";
-import MainTable from "@/shared/components/MainTable";
-import type { ProjectTasksTableRow } from "../types";
-import CustomDialog from "@/shared/components/CustomDialog";
-import { useDialogStore } from "@/stores/form/dialog";
-import TaskView from "./TaskView";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Loader, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { CustomDrawer } from "@/shared/components/CustomDrawer";
+import { useProjectDetails } from "../hooks/useProjectDetails";
+import type { ProjectTasksTableRow } from "../types";
+import TaskView from "./TaskView";
 
 const ProjectDetails = () => {
   const navigate = useNavigate();
@@ -50,9 +49,7 @@ const ProjectDetails = () => {
         subtitle="Are you sure you want to delete this task?"
       />
       {isLoadingProject ? (
-        <Box sx={{ textAlign: "center", padding: 2 }}>
-          <CircularProgress />
-        </Box>
+        <Loader />
       ) : (
         <>
           <Stack gap={2} sx={{ flexShrink: 0 }}>
@@ -99,9 +96,7 @@ const ProjectDetails = () => {
                 Tasks
               </Typography>
               {isLoadingTasks ? (
-                <Box sx={{ textAlign: "center", padding: 2 }}>
-                  <CircularProgress />
-                </Box>
+                <Loader />
               ) : rows?.length > 0 ? (
                 <Box
                   sx={{

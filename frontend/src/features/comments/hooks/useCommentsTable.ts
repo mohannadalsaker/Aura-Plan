@@ -3,7 +3,7 @@ import { useGetComments } from "../api/useGetComments";
 import type { CommentTableRow } from "../types";
 
 export const useCommentsTable = () => {
-  const { data } = useGetComments();
+  const { data, isLoading } = useGetComments();
 
   const columns: MainTableProps<CommentTableRow>["columns"] = [
     { key: "text", label: "Comment Text" },
@@ -14,5 +14,5 @@ export const useCommentsTable = () => {
 
   const rows = data?.data || [];
 
-  return { rows, columns, total: data?.total };
+  return { rows, columns, total: data?.total, isLoading };
 };

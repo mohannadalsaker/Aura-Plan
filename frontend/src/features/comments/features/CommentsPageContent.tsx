@@ -16,7 +16,7 @@ export const CommentsPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total } = useCommentsTable();
+  const { rows, columns, total, isLoading } = useCommentsTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -66,6 +66,7 @@ export const CommentsPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows}
+          loading={isLoading}
         />
       </Box>
       <TableFooter

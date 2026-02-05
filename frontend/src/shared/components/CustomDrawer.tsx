@@ -1,5 +1,6 @@
-import { CircularProgress, Drawer, Box } from "@mui/material";
+import { Box, Drawer } from "@mui/material";
 import { type ReactNode } from "react";
+import Loader from "./Loader";
 interface DrawerLayoutProps {
   children: ReactNode;
   open: boolean;
@@ -34,9 +35,7 @@ export const CustomDrawer = ({
       }}
     >
       {loading ? (
-        <Box sx={{ textAlign: "center", padding: 2 }}>
-          <CircularProgress />
-        </Box>
+        <Loader />
       ) : (
         <Box
           sx={{

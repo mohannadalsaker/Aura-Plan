@@ -19,7 +19,7 @@ export const RolesPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total } = useRolesTable();
+  const { rows, columns, total, isLoading } = useRolesTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -49,7 +49,17 @@ export const RolesPageContent = () => {
         <Typography sx={{ typography: "h2", fontWeight: 600 }}>
           Roles
         </Typography>
-        <Stack direction={"row"} alignItems={"center"} gap={2}>
+        <Stack
+          direction={"row"}
+          alignItems={"center"}
+          gap={2}
+          sx={{
+            flexWrap: {
+              xs: "wrap",
+              sm: "nowrap",
+            },
+          }}
+        >
           <TextFieldInput
             placeholder="Search in roles"
             height="42px"
@@ -73,7 +83,6 @@ export const RolesPageContent = () => {
       </Stack>
       <Box
         sx={{
-          backgroundColor: "#e1fdeeff",
           height: "100%",
           width: "100%",
           overflowY: "auto",
@@ -83,6 +92,7 @@ export const RolesPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows}
+          loading={isLoading}
         />
       </Box>
       <TableFooter

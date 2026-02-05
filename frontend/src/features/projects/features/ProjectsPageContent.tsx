@@ -19,7 +19,7 @@ export const ProjectsPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total } = useProjectsTable();
+  const { rows, columns, total, isLoading } = useProjectsTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -63,7 +63,17 @@ export const ProjectsPageContent = () => {
         <Typography sx={{ typography: "h2", fontWeight: 600 }}>
           Projects
         </Typography>
-        <Stack direction={"row"} alignItems={"center"} gap={2}>
+        <Stack
+          direction={"row"}
+          alignItems={"center"}
+          gap={2}
+          sx={{
+            flexWrap: {
+              xs: "wrap",
+              sm: "nowrap",
+            },
+          }}
+        >
           <TextFieldInput
             placeholder="Search in projects"
             height="42px"
@@ -87,7 +97,6 @@ export const ProjectsPageContent = () => {
       </Stack>
       <Box
         sx={{
-          backgroundColor: "#e1fdeeff",
           height: "100%",
           width: "100%",
           overflowY: "auto",
@@ -97,6 +106,7 @@ export const ProjectsPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows}
+          loading={isLoading}
         />
       </Box>
       <TableFooter

@@ -1,9 +1,10 @@
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
-import { useTaskComments } from "../hooks/useTaskComments";
-import TaskComment from "../components/TaskComment";
-import { TextFieldInput } from "@/shared/components/TextFieldInput";
 import MainButton from "@/shared/components/MainButton";
+import { TextFieldInput } from "@/shared/components/TextFieldInput";
+import { Stack, Typography } from "@mui/material";
 import { Send } from "lucide-react";
+import TaskComment from "../components/TaskComment";
+import { useTaskComments } from "../hooks/useTaskComments";
+import Loader from "@/shared/components/Loader";
 
 const TaskCommentsSection = () => {
   const { comments, isAdding, isLoadingComments, register, sendForm } =
@@ -20,11 +21,7 @@ const TaskCommentsSection = () => {
           overflow: "auto",
         }}
       >
-        {isLoadingComments && (
-          <Box sx={{ textAlign: "center", padding: 2 }}>
-            <CircularProgress />
-          </Box>
-        )}
+        {isLoadingComments && <Loader />}
         {comments?.length === 0 && (
           <Typography
             sx={{

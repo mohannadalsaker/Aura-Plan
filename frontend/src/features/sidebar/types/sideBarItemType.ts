@@ -1,5 +1,5 @@
 // import { IconType } from "@/shared";
-import type { MuiStyles, NavLinkStyles } from "./mui";
+import type { NavLinkStyles } from "./mui";
 
 export interface SideBarItemType {
   id: number;
@@ -26,13 +26,13 @@ export interface SideBarItemProps {
     id: number;
     name: string;
     route?: string;
-    isNormale: boolean;
     hasChildren: boolean;
     hasParent?: boolean;
   };
-  sx?: MuiStyles["sx"];
+  // sx?: MuiStyles["sx"];
   openedId: string;
-  toggleOpen: (id: string, hasParent?: boolean) => void;
+  isDrawer?: boolean;
+  // toggleOpen: (id: string, hasParent?: boolean) => void;
 }
 
 export interface SideBarLinkProps {

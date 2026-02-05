@@ -28,7 +28,7 @@ const SideBarDrawer = () => {
         },
       }}
     >
-      <SideBar />
+      <SideBar isDrawer={true} />
     </Drawer>
   );
 };
