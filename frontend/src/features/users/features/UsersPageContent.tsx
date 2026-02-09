@@ -19,7 +19,7 @@ const UsersPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total, isLoading } = useUsersTable();
+  const { rows, columns, total, isFetching } = useUsersTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -93,7 +93,7 @@ const UsersPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows!}
-          loading={isLoading}
+          loading={isFetching}
         />
       </Box>
       <TableFooter

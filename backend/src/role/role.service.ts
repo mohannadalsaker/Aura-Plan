@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateRoleDto, UpdateRoleDto } from './dto/role.dto';
 import { PaginationParams } from 'src/shared/types';
 import { buildPaginatedResponse } from 'src/shared/utils';
+import { Permissions } from '@prisma/client';
 
 @Injectable()
 export class RoleService {
@@ -17,13 +19,13 @@ export class RoleService {
   ) {}
 
   async getRoles({
-    role,
+    permissions,
     pageNumber,
     pageSize,
     q = '',
-  }: Partial<PaginationParams> & { role: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  }: Partial<PaginationParams> & { permissions: Permissions[] }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_ALL_ROLES',
     });
     const filterQuery = {
@@ -40,7 +42,9 @@ export class RoleService {
     const roles = await this.prisma.role.findMany({
       orderBy: { created_at: 'asc' },
     });
-    const total = await this.prisma.role.count({ ...filterQuery });
+    const total = await this.prisma.role.count({
+      where: { ...filterQuery.where },
+    });
 
     return buildPaginatedResponse({
       data: roles,
@@ -50,9 +54,15 @@ export class RoleService {
     });
   }
 
-  async getRoleById({ role, id }: { role: string; id: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  async getRoleById({
+    permissions,
+    id,
+  }: {
+    permissions: Permissions[];
+    id: string;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_ROLE',
     });
 
@@ -62,11 +72,24 @@ export class RoleService {
     return foundRole;
   }
 
-  async addRole({ role, body }: { role: string; body: CreateRoleDto }) {
-    await this.permissionService.hasPermission({
-      role,
+  async addRole({
+    permissions,
+    body,
+  }: {
+    permissions: Permissions[];
+    body: CreateRoleDto;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'CREATE_ROLE',
     });
+
+    const foundRole = await this.prisma.role.findFirst({
+      where: { name: body.name },
+    });
+
+    if (foundRole)
+      throw new BadRequestException('Role with this name already exists');
 
     await this.prisma.role.create({ data: body });
     return 'Role created';
@@ -74,31 +97,51 @@ export class RoleService {
 
   async updateRole({
     roleId,
-    role,
+    permissions,
     body,
   }: {
     roleId: string;
-    role: string;
+    permissions: Permissions[];
     body: UpdateRoleDto;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'UPDATE_ROLE',
     });
-    await this.getRoleById({ role, id: roleId });
+    const currentRole = await this.getRoleById({ permissions, id: roleId });
+
+    const foundRole = await this.prisma.role.findFirst({
+      where: { name: body.name },
+    });
+    if (foundRole && foundRole.id !== currentRole.id)
+      throw new BadRequestException('Role with this name already exists');
+
     await this.prisma.role.update({ where: { id: roleId }, data: body });
+
     return 'Role updated';
   }
 
-  async deleteRole({ role, roleId }: { role: string; roleId: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  async deleteRole({
+    permissions,
+    roleId,
+  }: {
+    permissions: Permissions[];
+    roleId: string;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'DELETE_ROLE',
     });
 
-    const foundRole = await this.getRoleById({ id: roleId, role });
-    if (foundRole.name === 'ADMIN')
-      throw new ForbiddenException("Role 'ADMIN' cannot be deleted");
+    await this.getRoleById({ id: roleId, permissions });
+
+    const roleUser = await this.prisma.user.findFirst({
+      where: { role_id: roleId },
+    });
+
+    if (roleUser) {
+      throw new ForbiddenException('There are users with this role');
+    }
 
     await this.prisma.role.delete({ where: { id: roleId } });
     return 'Role deleted';

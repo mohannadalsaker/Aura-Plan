@@ -3,7 +3,7 @@ import { useGetProjects } from "../api/useGetProjects";
 import type { ProjectTableRow } from "../types";
 
 export const useProjectsTable = () => {
-  const { data, isLoading } = useGetProjects();
+  const { data, isFetching } = useGetProjects();
 
   const columns: MainTableProps<ProjectTableRow>["columns"] = [
     { key: "title", label: "Project Title" },
@@ -15,5 +15,5 @@ export const useProjectsTable = () => {
 
   const rows = data?.data || [];
 
-  return { rows, columns, total: data?.total, isLoading };
+  return { rows, columns, total: data?.total, isFetching };
 };

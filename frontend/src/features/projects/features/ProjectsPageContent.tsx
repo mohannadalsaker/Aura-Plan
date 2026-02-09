@@ -19,7 +19,7 @@ export const ProjectsPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total, isLoading } = useProjectsTable();
+  const { rows, columns, total, isFetching } = useProjectsTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -106,7 +106,7 @@ export const ProjectsPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows}
-          loading={isLoading}
+          loading={isFetching}
         />
       </Box>
       <TableFooter

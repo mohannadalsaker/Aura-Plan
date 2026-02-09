@@ -4,7 +4,7 @@ import { Stack, Typography } from "@mui/material";
 import { useLoginForm } from "../hooks/useLoginForm";
 
 const LoginForm = () => {
-  const { errors, submitForm, register } = useLoginForm();
+  const { errors, submitForm, register, isPending } = useLoginForm();
   return (
     <form onSubmit={submitForm}>
       <Stack spacing={3}>
@@ -29,7 +29,7 @@ const LoginForm = () => {
           error={!!errors.password}
           helperText={errors.password?.message as string}
         />
-        <MainButton type="submit" variant="contained">
+        <MainButton isLoading={isPending} type="submit" variant="contained">
           Submit
         </MainButton>
       </Stack>

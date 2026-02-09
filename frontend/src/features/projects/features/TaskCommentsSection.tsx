@@ -1,10 +1,9 @@
 import MainButton from "@/shared/components/MainButton";
 import { TextFieldInput } from "@/shared/components/TextFieldInput";
-import { Stack, Typography } from "@mui/material";
+import { Skeleton, Stack, Typography } from "@mui/material";
 import { Send } from "lucide-react";
 import TaskComment from "../components/TaskComment";
 import { useTaskComments } from "../hooks/useTaskComments";
-import Loader from "@/shared/components/Loader";
 
 const TaskCommentsSection = () => {
   const { comments, isAdding, isLoadingComments, register, sendForm } =
@@ -21,7 +20,30 @@ const TaskCommentsSection = () => {
           overflow: "auto",
         }}
       >
-        {isLoadingComments && <Loader />}
+        {isLoadingComments &&
+          Array.from({ length: 2 }).map((el) => (
+            <Stack
+              key={el as number}
+              direction={"row"}
+              gap={1}
+              alignItems={"flex-start"}
+            >
+              <Skeleton
+                sx={{
+                  borderRadius: "50%",
+                  width: "35px",
+                  height: "35px",
+                }}
+              />
+              <Skeleton
+                sx={{
+                  height: "7px",
+                  width: "100%",
+                }}
+              />
+            </Stack>
+          ))}
+
         {comments?.length === 0 && (
           <Typography
             sx={{
@@ -30,7 +52,7 @@ const TaskCommentsSection = () => {
               fontWeight: 500,
             }}
           >
-            There is no comments yet
+            There are no comments yet
           </Typography>
         )}
         {comments?.map((comment) => (

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { PaginationParams } from 'src/shared/types';
 import { buildPaginatedResponse } from 'src/shared/utils';
 import { ProjectService } from 'src/project/project.service';
 import { TaskService } from 'src/task/task.service';
+import { Permissions } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -22,13 +24,13 @@ export class UserService {
   ) {}
 
   async getUsers({
-    role,
+    permissions,
     pageNumber,
     pageSize,
     q = '',
-  }: Partial<PaginationParams> & { role: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  }: Partial<PaginationParams> & { permissions: Permissions[] }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_ALL_USERS',
     });
 
@@ -50,7 +52,9 @@ export class UserService {
       ...filterQuery,
     });
 
-    const total = await this.prisma.user.count({ ...filterQuery });
+    const total = await this.prisma.user.count({
+      where: { ...filterQuery.where },
+    });
 
     return buildPaginatedResponse({
       data: users,
@@ -60,30 +64,42 @@ export class UserService {
     });
   }
 
-  async getUserProfile({ role, id }: { role: string; id: string }) {
+  async getUserProfile({
+    permissions,
+    id,
+  }: {
+    permissions: Permissions[];
+    id: string;
+  }) {
     const user = await this.prisma.user.findUnique({
       where: { id },
       omit: {
         password: true,
       },
-      include: { role: { omit: { permissions: true } } },
+      include: { role: true },
     });
     if (!user) throw new NotFoundException('Profile not found');
     const userTasks = await this.taskService.getAllTasks({
-      role,
+      permissions,
       userId: id,
     });
     const userProjects = await this.projectService.getAllProjects({
-      role,
+      permissions,
       userId: id,
     });
 
     return { user, projects: userProjects.data, tasks: userTasks.data };
   }
 
-  async getUserById({ role, id }: { role: string; id: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  async getUserById({
+    permissions,
+    id,
+  }: {
+    permissions: Permissions[];
+    id: string;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_USER',
     });
     const user = await this.prisma.user.findUnique({
@@ -98,27 +114,18 @@ export class UserService {
     return user;
   }
 
-  async getMemberUsers(role: string) {
-    await this.permissionService.hasPermission({
-      role,
+  async getMemberUsers(permissions: Permissions[]) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_USER',
     });
 
     const users = await this.prisma.user.findMany({
       where: {
         role: {
-          AND: [
-            {
-              name: {
-                not: 'ADMIN',
-              },
-            },
-            {
-              name: {
-                not: 'MANAGER',
-              },
-            },
-          ],
+          permissions: {
+            has: 'PARTICIPATE_PROJECT',
+          },
         },
       },
       include: { role: true },
@@ -127,16 +134,18 @@ export class UserService {
     return users;
   }
 
-  async getManagerUsers(role: string) {
-    await this.permissionService.hasPermission({
-      role,
+  async getManagerUsers(permissions: Permissions[]) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_USER',
     });
 
     const users = await this.prisma.user.findMany({
       where: {
         role: {
-          name: 'MANAGER',
+          permissions: {
+            has: 'MANAGE_PROJECT',
+          },
         },
       },
       include: { role: true },
@@ -145,9 +154,15 @@ export class UserService {
     return users;
   }
 
-  async createUser({ role, body }: { role: string; body: CreateUserDto }) {
-    await this.permissionService.hasPermission({
-      role,
+  async createUser({
+    permissions,
+    body,
+  }: {
+    permissions: Permissions[];
+    body: CreateUserDto;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'CREATE_USER',
     });
     const { password, role_id, ...rest } = body;
@@ -171,26 +186,40 @@ export class UserService {
   }
   async updateUser({
     userId,
-    role,
+    permissions,
     body,
   }: {
     userId: string;
-    role: string;
+    permissions: Permissions[];
     body: UpdateUserDto;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'UPDATE_USER',
     });
-    const { role_id, ...rest } = body;
-    await this.getUserById({ role, id: userId });
+    const canChangePass = this.permissionService.has({
+      permissions,
+      permission: 'CHANGE_PASSWORD',
+    });
+    const { role_id, password, ...rest } = body;
+
+    await this.getUserById({ permissions, id: userId });
+
+    if (rest.email) {
+      const foundUser = await this.prisma.user.findUnique({
+        where: { email: rest.email },
+      });
+      if (foundUser)
+        throw new BadRequestException('User with this email already exists');
+    }
     await this.prisma.user.update({
       where: { id: userId },
       data: {
+        ...(password ? (canChangePass ? { password: password } : {}) : {}),
         ...rest,
         ...(role_id
           ? {
-              role: {
+              permissions: {
                 connect: { id: role_id },
               },
             }
@@ -200,13 +229,22 @@ export class UserService {
     return 'User updated';
   }
 
-  async deleteUser({ role, id }: { role: string; id: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  async deleteUser({
+    permissions,
+    id,
+  }: {
+    permissions: Permissions[];
+    id: string;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'DELETE_USER',
     });
-    await this.getUserById({ role, id });
+    const user = await this.getUserById({ permissions, id });
+    if (user.is_system)
+      throw new ForbiddenException('System user cannot be deleted');
     await this.prisma.user.delete({ where: { id } });
+
     return 'User deleted';
   }
 }

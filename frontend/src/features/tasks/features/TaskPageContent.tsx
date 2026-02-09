@@ -19,7 +19,7 @@ export const TasksPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total, isLoading } = useTasksTable();
+  const { rows, columns, total, isFetching } = useTasksTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -107,7 +107,7 @@ export const TasksPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows}
-          loading={isLoading}
+          loading={isFetching}
         />
       </Box>
       <TableFooter

@@ -3,7 +3,7 @@ import { useGetUsers } from "../api/useGetUsers";
 import type { UserTableRow } from "../types";
 
 export const useUsersTable = () => {
-  const { data, isLoading } = useGetUsers();
+  const { data, isFetching } = useGetUsers();
 
   const columns: MainTableProps<UserTableRow>["columns"] = [
     { key: "name", label: "Name" },
@@ -16,5 +16,5 @@ export const useUsersTable = () => {
 
   const rows = data?.data || [];
 
-  return { rows, columns, total: data?.total, isLoading };
+  return { rows, columns, total: data?.total, isFetching };
 };

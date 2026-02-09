@@ -27,7 +27,7 @@ export class TaskController {
   @Get()
   async getTasks(@Request() req, @Query() query) {
     return this.taskService.getAllTasks({
-      role: req.user.role,
+      permissions: req.user.permissions,
       userId: req.user.id,
       ...query,
     });
@@ -36,7 +36,7 @@ export class TaskController {
   @Get('/project/:id')
   async getTasksByProjectId(@Param('id') id: string, @Request() req) {
     return this.taskService.getAllTasks({
-      role: req.user.role,
+      permissions: req.user.permissions,
       userId: req.user.id,
       projectId: id,
     });
@@ -44,13 +44,16 @@ export class TaskController {
 
   @Get('/user/:id')
   async getUserTasks(@Request() req, @Param('id') userId: string) {
-    return this.taskService.getAllTasks({ role: req.user.role, userId });
+    return this.taskService.getAllTasks({
+      permissions: req.user.permissions,
+      userId,
+    });
   }
 
   @Get(':id')
   async getTaskById(@Param('id') id: string, @Request() req) {
     return this.taskService.getTask({
-      role: req.user.role,
+      permissions: req.user.permissions,
       taskId: id,
       userId: req.user.id,
     });
@@ -59,7 +62,7 @@ export class TaskController {
   @Post()
   async createTask(@Request() req, @Body() body: CreateTaskDto) {
     return this.taskService.createTask({
-      role: req.user.role,
+      permissions: req.user.permissions,
       body,
       userId: req.user.id,
     });
@@ -72,7 +75,7 @@ export class TaskController {
     @Body() body: ChangeTaskStatusDto,
   ) {
     return this.taskService.changeStatus({
-      role: req.user.role,
+      permissions: req.user.permissions,
       body,
       userId: req.user.id,
       id,
@@ -86,7 +89,7 @@ export class TaskController {
     @Body() body: RateTaskDto,
   ) {
     return this.taskService.rateTask({
-      role: req.user.role,
+      permissions: req.user.permissions,
       body,
       userId: req.user.id,
       id,
@@ -100,7 +103,7 @@ export class TaskController {
     @Param('id') id: string,
   ) {
     return this.taskService.updateTask({
-      role: req.user.role,
+      permissions: req.user.permissions,
       body,
       taskId: id,
       userId: req.user.id,
@@ -109,6 +112,9 @@ export class TaskController {
 
   @Delete(':id')
   async deleteTask(@Param('id') id: string, @Request() req) {
-    return this.taskService.deleteTask({ role: req.user.role, id });
+    return this.taskService.deleteTask({
+      permissions: req.user.permissions,
+      id,
+    });
   }
 }

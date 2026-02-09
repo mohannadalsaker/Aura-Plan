@@ -1,34 +1,32 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Permissions } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class PermissionService {
-  constructor(private prisma: PrismaService) {}
-
-  async getAllPermissions() {
-    return Object.values(Permissions);
+  has({
+    permission,
+    permissions,
+  }: {
+    permissions: Permissions[];
+    permission: Permissions;
+  }): boolean {
+    return permissions.includes(permission);
   }
 
-  async hasPermission({
-    role,
+  async getAllPermissions() {
+    const allPermissions = Object.values(Permissions) as Permissions[];
+    return allPermissions;
+  }
+
+  assert({
     permission,
+    permissions,
   }: {
-    role: string;
+    permissions: Permissions[];
     permission: Permissions;
-  }) {
-    const foundRole = await this.prisma.role.findUnique({
-      where: { name: role },
-    });
-    if (!foundRole) throw new NotFoundException('Role not found');
-    if (!foundRole.permissions.includes(permission))
-      throw new ForbiddenException(
-        `You don't have permission to ${permission}`,
-      );
-    return true;
+  }): void {
+    if (!this.has({ permissions, permission })) {
+      throw new ForbiddenException(`Missing permission: ${permission}`);
+    }
   }
 }

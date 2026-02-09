@@ -10,7 +10,7 @@ export const useTaskComments = () => {
   const queryClient = useQueryClient();
   const { taskId } = useProjectDetailsStore();
 
-  const { data: comments, isLoading: isLoadingComments } =
+  const { data: comments, isFetching: isLoadingComments } =
     useGetCommentsByTaskId({ id: taskId });
 
   const { mutate: addComment, isPending: isAdding } = useAddCommentToTask();
@@ -32,7 +32,7 @@ export const useTaskComments = () => {
           });
           reset();
         },
-      }
+      },
     );
   };
 

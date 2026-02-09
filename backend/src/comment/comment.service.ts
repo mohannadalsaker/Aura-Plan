@@ -5,6 +5,7 @@ import { TaskService } from 'src/task/task.service';
 import { CreateCommentDto } from './dto/comment.dto';
 import { PaginationParams } from 'src/shared/types';
 import { buildPaginatedResponse } from 'src/shared/utils';
+import { Permissions } from '@prisma/client';
 
 @Injectable()
 export class CommentService {
@@ -15,13 +16,13 @@ export class CommentService {
   ) {}
 
   async getAllComments({
-    role,
+    permissions,
     pageNumber,
     pageSize,
     q = '',
-  }: Partial<PaginationParams> & { role: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  }: Partial<PaginationParams> & { permissions: Permissions[] }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_ALL_COMMENTS',
     });
 
@@ -44,7 +45,9 @@ export class CommentService {
       ...filterQuery,
     });
 
-    const total = await this.prisma.comment.count({ ...filterQuery });
+    const total = await this.prisma.comment.count({
+      where: { ...filterQuery.where },
+    });
 
     return buildPaginatedResponse({
       data: comments,
@@ -55,20 +58,20 @@ export class CommentService {
   }
 
   async getCommentsByTask({
-    role,
+    permissions,
     userId,
     taskId,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId: string;
     taskId: string;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_COMMENT',
     });
     const task = await this.taskService.getTask({
-      role,
+      permissions,
       userId,
       taskId,
       withComments: true,
@@ -78,22 +81,26 @@ export class CommentService {
   }
 
   async getComment({
-    role,
+    permissions,
     userId,
     commentId,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId: string;
     commentId: string;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_COMMENT',
+    });
+    const canReadComments = this.permissionService.has({
+      permissions,
+      permission: 'READ_ALL_COMMENTS',
     });
     const comment = await this.prisma.comment.findUnique({
       where: {
         id: commentId,
-        ...(role === 'ADMIN' ? {} : { user_id: userId }),
+        ...(canReadComments ? {} : { user_id: userId }),
       },
       include: { user: { omit: { password: true } } },
     });
@@ -103,21 +110,21 @@ export class CommentService {
   }
 
   async createComment({
-    role,
+    permissions,
     userId,
     taskId,
     body,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId: string;
     taskId: string;
     body: CreateCommentDto;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'CREATE_COMMENT',
     });
-    await this.taskService.getTask({ role, userId, taskId });
+    await this.taskService.getTask({ permissions, userId, taskId });
     await this.prisma.comment.create({
       data: {
         ...body,
@@ -129,19 +136,19 @@ export class CommentService {
   }
 
   async deleteComment({
-    role,
+    permissions,
     userId,
     id,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId: string;
     id: string;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    await this.permissionService.assert({
+      permissions,
       permission: 'DELETE_COMMENT',
     });
-    await this.getComment({ role, userId, commentId: id });
+    await this.getComment({ permissions, userId, commentId: id });
 
     await this.prisma.comment.delete({ where: { id } });
     return 'Comment deleted';

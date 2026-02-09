@@ -22,6 +22,7 @@ model User {
   role_id          String         @db.Uuid
   email            String         @unique
   last_login       DateTime?
+  is_system        Boolean        @default(false)
   comments         Comment[]
   member_projects  Project[]      @relation("ProjectMembers")
   managed_projects Project[]      @relation("ProjectManager")
@@ -160,6 +161,8 @@ enum Permissions {
   UPDATE_PROJECT
   DELETE_PROJECT
   CHANGE_PROJECT_STATUS
+  MANAGE_PROJECT
+  PARTICIPATE_PROJECT
   // TASK
   CREATE_TASK
   READ_ALL_TASKS
@@ -174,6 +177,7 @@ enum Permissions {
   READ_USER
   UPDATE_USER
   DELETE_USER
+  CHANGE_PASSWORD
   // ROLE
   CREATE_ROLE
   READ_ALL_ROLES

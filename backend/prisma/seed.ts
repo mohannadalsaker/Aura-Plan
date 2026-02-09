@@ -5,18 +5,19 @@ const prisma = new PrismaClient();
 
 async function main() {
   const allPermissions = Object.values(Permissions) as Permissions[];
-  await prisma.role.createMany({
-    data: [{ name: 'ADMIN', permissions: allPermissions }, { name: 'MANAGER' }],
-    skipDuplicates: true,
-  });
 
-  const adminRole = await prisma.role.findUnique({
+  let adminRole = await prisma.role.findUnique({
     where: { name: 'ADMIN' },
   });
 
-  if (!adminRole) {
-    throw new Error('ADMIN role not found after seeding');
-  }
+  if (!adminRole)
+    adminRole = await prisma.role.create({
+      data: { name: 'ADMIN', permissions: allPermissions },
+    });
+
+  // if (!adminRole) {
+  //   throw new Error('ADMIN role not found after seeding');
+  // }
 
   const hashed = await bcrypt.hash('StrongAdminPass123!', 10);
 
@@ -29,6 +30,7 @@ async function main() {
       password: hashed,
       role_id: adminRole.id,
       last_login: new Date(),
+      is_system: true,
     },
   });
 }

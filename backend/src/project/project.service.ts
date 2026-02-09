@@ -12,6 +12,7 @@ import {
   CreateProjectDto,
   UpdateProjectDto,
 } from './dto/project.dto';
+import { Permissions } from '@prisma/client';
 
 @Injectable()
 export class ProjectService {
@@ -21,21 +22,24 @@ export class ProjectService {
   ) {}
 
   async getAllProjects({
-    role,
+    permissions,
     userId,
     pageNumber,
     pageSize,
     q = '',
-  }: Partial<PaginationParams> & { role: string; userId: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  }: Partial<PaginationParams> & {
+    permissions: Permissions[];
+    userId: string;
+  }) {
+    const canReadAll = this.permissionService.has({
+      permissions,
       permission: 'READ_ALL_PROJECTS',
     });
     const filterQuery = {
       ...(pageNumber ? { skip: (+pageNumber - 1) * +(pageSize || 10) } : {}),
       ...(pageSize ? { take: +pageSize } : {}),
       where: {
-        ...(role === 'ADMIN'
+        ...(canReadAll
           ? {}
           : {
               OR: [
@@ -62,7 +66,9 @@ export class ProjectService {
       ...filterQuery,
     });
 
-    const total = await this.prisma.project.count({ ...filterQuery });
+    const total = await this.prisma.project.count({
+      where: { ...filterQuery.where },
+    });
 
     return buildPaginatedResponse({
       data: projects,
@@ -73,18 +79,23 @@ export class ProjectService {
   }
 
   async getProject({
-    role,
+    permissions,
     userId,
     id,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId?: string;
     id: string;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_PROJECT',
     });
+    const canReadAll = this.permissionService.has({
+      permissions,
+      permission: 'READ_ALL_PROJECTS',
+    });
+
     const project = await this.prisma.project.findUnique({
       where: { id },
       include: {
@@ -93,28 +104,35 @@ export class ProjectService {
       },
     });
     if (!project) throw new NotFoundException('Project not found');
-    const isAdmin = role === 'ADMIN';
+
     const isMember =
       project.members.some((mem) => mem.id === userId) ||
       project.manager_id === userId;
 
-    if (!isAdmin && !isMember) throw new ForbiddenException('User not allowed');
+    if (!canReadAll && !isMember)
+      throw new ForbiddenException('User not allowed');
     return project;
   }
 
-  async getProjectUsers({ role, id }: { role: string; id: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  async getProjectUsers({
+    permissions,
+    id,
+  }: {
+    permissions: Permissions[];
+    id: string;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_PROJECT',
     });
-    await this.permissionService.hasPermission({
-      role,
-      permission: 'CREATE_PROJECT',
-    });
-    await this.permissionService.hasPermission({
-      role,
-      permission: 'UPDATE_PROJECT',
-    });
+    // this.permissionService.assert({
+    //   permissions,
+    //   permission: 'CREATE_PROJECT' ,
+    // });
+    // this.permissionService.assert({
+    //   permissions,
+    //   permission: 'UPDATE_PROJECT' ,
+    // });
     const users = await this.prisma.user.findMany({
       where: {
         member_projects: {
@@ -130,14 +148,14 @@ export class ProjectService {
   }
 
   async createProject({
-    role,
+    permissions,
     body,
   }: {
-    role: string;
+    permissions: Permissions[];
     body: CreateProjectDto;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'CREATE_PROJECT',
     });
     const { manager_id, members, start_date, end_date, ...rest } = body;
@@ -157,16 +175,16 @@ export class ProjectService {
   }
 
   async updateProject({
-    role,
+    permissions,
     body,
     projectId,
   }: {
-    role: string;
+    permissions: Permissions[];
     body: UpdateProjectDto;
     projectId: string;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'UPDATE_PROJECT',
     });
 
@@ -197,32 +215,38 @@ export class ProjectService {
     return 'Project updated';
   }
 
-  async deleteProject({ role, id }: { role: string; id: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  async deleteProject({
+    permissions,
+    id,
+  }: {
+    permissions: Permissions[];
+    id: string;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'DELETE_PROJECT',
     });
-    await this.getProject({ id, role });
+    await this.getProject({ id, permissions });
     await this.prisma.project.delete({ where: { id } });
     return 'Project deleted';
   }
 
   async changeStatus({
-    role,
+    permissions,
     userId,
     id,
     body,
   }: {
     id: string;
     body: ChangeProjectStatusDto;
-    role: string;
+    permissions: Permissions[];
     userId: string;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'CHANGE_PROJECT_STATUS',
     });
-    const oldProject = await this.getProject({ role, id, userId });
+    const oldProject = await this.getProject({ permissions, id, userId });
 
     await this.prisma.$transaction([
       this.prisma.project.update({

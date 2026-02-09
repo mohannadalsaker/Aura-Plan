@@ -21,17 +21,26 @@ export class RoleController {
 
   @Get()
   async getAllRoles(@Request() req, @Query() query) {
-    return this.roleService.getRoles({ role: req.user.role, ...query });
+    return this.roleService.getRoles({
+      permissions: req.user.permissions,
+      ...query,
+    });
   }
 
   @Get(':id')
   async getRoleById(@Request() req, @Param('id') id: string) {
-    return this.roleService.getRoleById({ id, role: req.user.role });
+    return this.roleService.getRoleById({
+      id,
+      permissions: req.user.permissions,
+    });
   }
 
   @Post()
   async createRole(@Request() req, @Body() body: CreateRoleDto) {
-    return this.roleService.addRole({ role: req.user.role, body });
+    return this.roleService.addRole({
+      permissions: req.user.permissions,
+      body,
+    });
   }
 
   @Patch(':id')
@@ -41,7 +50,7 @@ export class RoleController {
     @Param('id') id: string,
   ) {
     return this.roleService.updateRole({
-      role: req.user.role,
+      permissions: req.user.permissions,
       roleId: id,
       body,
     });
@@ -49,6 +58,9 @@ export class RoleController {
 
   @Delete(':id')
   async deleteRole(@Request() req, @Param('id') id: string) {
-    return this.roleService.deleteRole({ role: req.user.role, roleId: id });
+    return this.roleService.deleteRole({
+      permissions: req.user.permissions,
+      roleId: id,
+    });
   }
 }

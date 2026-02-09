@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { TaskStatus } from '@prisma/client';
+import { Permissions, TaskStatus } from '@prisma/client';
 import { PermissionService } from 'src/permission/permission.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProjectService } from 'src/project/project.service';
@@ -25,19 +25,19 @@ export class TaskService {
   ) {}
 
   async getAllTasks({
-    role,
+    permissions,
     userId,
     projectId,
     pageNumber,
     pageSize,
     q = '',
   }: Partial<PaginationParams> & {
-    role: string;
+    permissions: Permissions[];
     userId: string;
     projectId?: string;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    const canReadAll = this.permissionService.has({
+      permissions,
       permission: 'READ_ALL_TASKS',
     });
     const filterQuery = {
@@ -45,7 +45,7 @@ export class TaskService {
       ...(pageSize ? { take: +pageSize } : {}),
       where: {
         ...(projectId ? { project_id: projectId } : {}),
-        ...(role === 'ADMIN'
+        ...(canReadAll
           ? {}
           : {
               OR: [
@@ -73,7 +73,9 @@ export class TaskService {
       ...filterQuery,
     });
 
-    const total = await this.prisma.task.count({ ...filterQuery });
+    const total = await this.prisma.task.count({
+      where: { ...filterQuery.where },
+    });
 
     return buildPaginatedResponse({
       data: tasks,
@@ -84,24 +86,28 @@ export class TaskService {
   }
 
   async getTask({
-    role,
+    permissions,
     userId,
     taskId,
     withComments,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId?: string;
     taskId: string;
     withComments?: boolean;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'READ_TASK',
+    });
+    const canReadAll = this.permissionService.has({
+      permissions,
+      permission: 'READ_ALL_TASKS',
     });
     const task = await this.prisma.task.findUnique({
       where: {
         id: taskId,
-        ...(role === 'ADMIN'
+        ...(canReadAll
           ? {}
           : {
               OR: [
@@ -136,21 +142,25 @@ export class TaskService {
   }
 
   async createTask({
-    role,
+    permissions,
     userId,
     body,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId: string;
     body: CreateTaskDto;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'CREATE_TASK',
     });
 
     const { project_id, users, start_date, end_date, ...rest } = body;
-    await this.projectService.getProject({ role, userId, id: project_id });
+    await this.projectService.getProject({
+      permissions,
+      userId,
+      id: project_id,
+    });
 
     await this.prisma.task.create({
       data: {
@@ -172,24 +182,28 @@ export class TaskService {
   }
 
   async updateTask({
-    role,
+    permissions,
     userId,
     taskId,
     body,
   }: {
-    role: string;
+    permissions: Permissions[];
     userId: string;
     taskId: string;
     body: UpdateTaskDto;
   }) {
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'UPDATE_TASK',
     });
 
     const { project_id, users, start_date, end_date, ...rest } = body;
     if (project_id)
-      await this.projectService.getProject({ role, userId, id: project_id });
+      await this.projectService.getProject({
+        permissions,
+        userId,
+        id: project_id,
+      });
 
     const current = await this.prisma.tasksOnUsers.findMany({
       where: { task_id: taskId },
@@ -232,30 +246,36 @@ export class TaskService {
     return 'Task updated';
   }
 
-  async deleteTask({ role, id }: { role: string; id: string }) {
-    await this.permissionService.hasPermission({
-      role,
+  async deleteTask({
+    permissions,
+    id,
+  }: {
+    permissions: Permissions[];
+    id: string;
+  }) {
+    this.permissionService.assert({
+      permissions,
       permission: 'DELETE_TASK',
     });
-    await this.getTask({ role, taskId: id });
+    await this.getTask({ permissions, taskId: id });
     await this.prisma.task.delete({ where: { id } });
     return 'Task Deleted';
   }
 
   async changeStatus({
-    role,
+    permissions,
     userId,
     id,
     body,
   }: {
     id: string;
     body: ChangeTaskStatusDto;
-    role: string;
+    permissions: Permissions[];
     userId: string;
   }) {
-    const oldTask = await this.getTask({ role, taskId: id, userId });
-    await this.permissionService.hasPermission({
-      role,
+    const oldTask = await this.getTask({ permissions, taskId: id, userId });
+    this.permissionService.assert({
+      permissions,
       permission: 'CHANGE_TASK_STATUS',
     });
 
@@ -280,19 +300,19 @@ export class TaskService {
 
   async rateTask({
     id,
-    role,
+    permissions,
     body,
     userId,
   }: {
     id: string;
-    role: string;
+    permissions: Permissions[];
     userId: string;
     body: RateTaskDto;
   }) {
-    await this.getTask({ role, taskId: id, userId });
+    await this.getTask({ permissions, taskId: id, userId });
 
-    await this.permissionService.hasPermission({
-      role,
+    this.permissionService.assert({
+      permissions,
       permission: 'RATE_TASK',
     });
 

@@ -26,7 +26,7 @@ export class ProjectController {
   @Get()
   async getAllProjects(@Request() req, @Query() query) {
     return this.projectService.getAllProjects({
-      role: req.user.role,
+      permissions: req.user.permissions,
       userId: req.user.id,
       ...query,
     });
@@ -35,7 +35,7 @@ export class ProjectController {
   @Get(':id')
   async getPorjectById(@Request() req, @Param('id') id: string) {
     return this.projectService.getProject({
-      role: req.user.role,
+      permissions: req.user.permissions,
       userId: req.user.id,
       id,
     });
@@ -44,19 +44,25 @@ export class ProjectController {
   @Get(':id/users')
   async getProjectUsers(@Request() req, @Param('id') id: string) {
     return this.projectService.getProjectUsers({
-      role: req.user.role,
+      permissions: req.user.permissions,
       id,
     });
   }
 
   @Get('user/:id')
   async getUserProjects(@Request() req, @Param('id') userId: string) {
-    return this.projectService.getAllProjects({ role: req.user.role, userId });
+    return this.projectService.getAllProjects({
+      permissions: req.user.permissions,
+      userId,
+    });
   }
 
   @Post()
   async createProject(@Request() req, @Body() body: CreateProjectDto) {
-    return this.projectService.createProject({ role: req.user.role, body });
+    return this.projectService.createProject({
+      permissions: req.user.permissions,
+      body,
+    });
   }
 
   @Post('changeStatus/:id')
@@ -66,7 +72,7 @@ export class ProjectController {
     @Body() body: ChangeProjectStatusDto,
   ) {
     return this.projectService.changeStatus({
-      role: req.user.role,
+      permissions: req.user.permissions,
       body,
       id,
       userId: req.user.id,
@@ -80,7 +86,7 @@ export class ProjectController {
     @Param('id') id: string,
   ) {
     return this.projectService.updateProject({
-      role: req.user.role,
+      permissions: req.user.permissions,
       body,
       projectId: id,
     });
@@ -88,6 +94,9 @@ export class ProjectController {
 
   @Delete(':id')
   async deleteProject(@Request() req, @Param('id') id: string) {
-    return this.projectService.deleteProject({ role: req.user.role, id });
+    return this.projectService.deleteProject({
+      permissions: req.user.permissions,
+      id,
+    });
   }
 }

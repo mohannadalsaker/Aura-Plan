@@ -7,6 +7,7 @@ import { useDrawerStore } from "@/stores/form/drawer";
 import { Stack } from "@mui/material";
 import { useUsersForm } from "../hooks/useUsersForm";
 import { useGetProfile } from "../api/useGetProfile";
+import { Permissions } from "@/shared/types";
 
 const UserForm = () => {
   const { data, isLoading: isLoadingProfile } = useGetProfile();
@@ -47,7 +48,9 @@ const UserForm = () => {
                 helperText={errors.email?.message}
                 isRequired={true}
               />
-              {data?.data?.user?.role?.name !== "ADMIN" ? null : (
+              {data?.data?.user?.role?.permissions.includes(
+                Permissions.CHANGE_PASSWORD,
+              ) ? null : (
                 <TextFieldInput
                   label="Password"
                   {...register("password")}

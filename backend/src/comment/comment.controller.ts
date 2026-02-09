@@ -21,7 +21,7 @@ export class CommentController {
   @Get()
   async getComments(@Request() req, @Query() query) {
     return this.commentService.getAllComments({
-      role: req.user.role,
+      permissions: req.user.permissions,
       ...query,
     });
   }
@@ -29,7 +29,7 @@ export class CommentController {
   @Get('task/:taskId')
   async getCommentsByTaskId(@Request() req, @Param('taskId') taskId: string) {
     return this.commentService.getCommentsByTask({
-      role: req.user.role,
+      permissions: req.user.permissions,
       taskId,
       userId: req.user.id,
     });
@@ -42,7 +42,7 @@ export class CommentController {
     @Param('taskId') taskId: string,
   ) {
     return this.commentService.createComment({
-      role: req.user.role,
+      permissions: req.user.permissions,
       userId: req.user.id,
       body,
       taskId,
@@ -52,7 +52,7 @@ export class CommentController {
   @Delete(':id')
   async deleteComment(@Request() req, @Param('id') id: string) {
     return this.commentService.deleteComment({
-      role: req.user.role,
+      permissions: req.user.permissions,
       userId: req.user.id,
       id,
     });

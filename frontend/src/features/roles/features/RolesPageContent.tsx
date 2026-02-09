@@ -19,7 +19,7 @@ export const RolesPageContent = () => {
     pageNumber,
     pageSize,
   } = useQueryParams();
-  const { rows, columns, total, isLoading } = useRolesTable();
+  const { rows, columns, total, isFetching } = useRolesTable();
   const {
     confirmDelete,
     closeDeleteDialog,
@@ -92,7 +92,7 @@ export const RolesPageContent = () => {
           actions={tableActions}
           columns={columns}
           rows={rows}
-          loading={isLoading}
+          loading={isFetching}
         />
       </Box>
       <TableFooter
