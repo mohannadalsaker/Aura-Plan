@@ -48,7 +48,7 @@ const UserForm = () => {
                 helperText={errors.email?.message}
                 isRequired={true}
               />
-              {data?.data?.user?.role?.permissions.includes(
+              {data?.data?.user?.role?.permissions?.includes(
                 Permissions.CHANGE_PASSWORD,
               ) ? null : (
                 <TextFieldInput
