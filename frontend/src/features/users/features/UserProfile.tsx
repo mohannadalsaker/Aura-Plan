@@ -26,7 +26,7 @@ const UserProfile = () => {
           <Typography
             sx={{ typography: "h4", fontWeight: 600, color: "text.primary" }}
           >
-            {data?.data?.user?.username}
+            {data?.user?.username}
           </Typography>
           <Typography
             sx={{
@@ -35,8 +35,7 @@ const UserProfile = () => {
               color: "secondary.light",
             }}
           >
-            Last login:{" "}
-            {dayjs(data?.data?.user?.last_login).format("YYYY-MM-DD")}
+            Last login: {dayjs(data?.user?.last_login).format("YYYY-MM-DD")}
           </Typography>
         </Stack>
         <Stack direction={"row"} gap={2} flexWrap={"wrap"}>
@@ -56,7 +55,7 @@ const UserProfile = () => {
                 color: "text.primary",
               }}
             >
-              {data?.data?.user?.email}
+              {data?.user?.email}
             </Typography>
           </Stack>
           <Stack direction={"row"} gap={1}>
@@ -75,7 +74,7 @@ const UserProfile = () => {
                 color: "text.primary",
               }}
             >
-              {data?.data?.user?.role.name}
+              {data?.user?.role.name}
             </Typography>
           </Stack>
         </Stack>
@@ -96,12 +95,12 @@ const UserProfile = () => {
         <UserDataCard
           title="Projects"
           pathPrefix="/projects/view"
-          data={data?.data?.projects!}
+          data={data?.projects!}
         />
         <UserDataCard
           title="Tasks"
           pathPrefix="/tasks/view"
-          data={data?.data?.tasks!}
+          data={data?.tasks!}
         />
       </Stack>
     </Stack>

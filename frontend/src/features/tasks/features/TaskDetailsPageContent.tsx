@@ -11,14 +11,17 @@ import UserCircle from "@/shared/components/UserCircle";
 import dayjs from "dayjs";
 import React from "react";
 import Loader from "@/shared/components/Loader";
+import { useGetProfile } from "@/features/users/api/useGetProfile";
+import { Permissions } from "@/shared/types";
 
 const TaskDetailsPageContent = () => {
+  const { data: profileData, isLoading: isLoadingProfile } = useGetProfile();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data, rate, isRating, isPending } = useTaskDetails();
   const { openDrawerEdit } = useDrawerStore();
 
-  if (isPending) return <Loader />;
+  if (isPending || isLoadingProfile) return <Loader />;
 
   return (
     <Stack gap={4} p={2} height={"100%"} overflow={"auto"}>
@@ -53,16 +56,20 @@ const TaskDetailsPageContent = () => {
               </Typography>
               <StatusBadge status={data?.status!} />
             </Stack>
-            <Rating
-              size="large"
-              name="rating"
-              defaultValue={data?.rating || 0.5}
-              precision={0.5}
-              disabled={isRating}
-              onChange={(_event, value) => {
-                if (value) rate(value);
-              }}
-            />
+            {profileData?.user?.role?.permissions?.includes(
+              Permissions.RATE_TASK,
+            ) ? (
+              <Rating
+                size="large"
+                name="rating"
+                defaultValue={data?.rating || 0.5}
+                precision={0.5}
+                disabled={isRating}
+                onChange={(_event, value) => {
+                  if (value) rate(value);
+                }}
+              />
+            ) : null}
           </Stack>
           <MainButton onClick={() => openDrawerEdit(id!)}>Edit</MainButton>
         </Stack>

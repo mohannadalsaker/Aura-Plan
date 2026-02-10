@@ -6,7 +6,7 @@ import type { ProjectsStatsData } from "../types";
 export const useGetProjectsStatistics = () => {
   const query = useQuery<ApiResponse<ProjectsStatsData>>({
     queryKey: ["project_stats"],
-    queryFn: () => fetcher("analytics/projects"),
+    queryFn: () => fetcher(`analytics/projects`),
     staleTime: 0,
   });
 

@@ -11,6 +11,6 @@ export interface UserResponseData {
       permissions: Permissions[];
     };
   };
-  tasks: { id: string; name: string }[];
-  projects: { id: string; name: string }[];
+  tasks: { id: string; title: string }[];
+  projects: { id: string; title: string }[];
 }

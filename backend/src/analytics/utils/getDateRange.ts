@@ -3,7 +3,7 @@ import { DashboardRange } from '../types';
 
 export const getDateRange = (range: DashboardRange) => {
   const now = dayjs();
-  let start = dayjs().subtract(7, 'days'); // Default
+  let start = dayjs().subtract(7, 'days');
 
   switch (range) {
     case DashboardRange.TODAY:
@@ -22,7 +22,7 @@ export const getDateRange = (range: DashboardRange) => {
       start = now.startOf('year');
       break;
     case DashboardRange.ALL_TIME:
-      start = dayjs('2020-01-01'); // Or your app launch date
+      start = dayjs('2020-01-01');
       break;
   }
 

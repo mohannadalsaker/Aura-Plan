@@ -1,9 +1,8 @@
-import { Line } from "react-chartjs-2";
-import { getStatusStyles } from "@/shared/utils/getStatusStyles";
-import { useGetTasksStatistics } from "../api/useGetTasksStatistics";
 import type { TaskStatus } from "@/features/tasks/types";
-import Loader from "@/shared/components/Loader";
+import { getStatusStyles } from "@/shared/utils/getStatusStyles";
 import { Stack, Typography } from "@mui/material";
+import { Line } from "react-chartjs-2";
+import type { TasksStatsData } from "../types";
 
 const STATUSES = [
   "todo",
@@ -13,18 +12,14 @@ const STATUSES = [
   "cancelled",
 ] as const;
 
-const TasksSection = () => {
-  const { data, isLoading } = useGetTasksStatistics();
-
-  if (isLoading) return <Loader />;
-
-  const labels = data?.data?.map((d) => d.date);
+const TasksSection = ({ data }: { data: TasksStatsData[] }) => {
+  const labels = data?.map((d) => d.date);
 
   const datasets = STATUSES.map((status) => {
     const colors = getStatusStyles(status.toUpperCase() as TaskStatus);
     return {
       label: status.replace("_", " ").toUpperCase(),
-      data: data?.data?.map((d) => d[status] ?? 0),
+      data: data?.map((d) => d[status] ?? 0),
       borderColor: colors.color,
       backgroundColor: colors.backgroundColor,
       fill: false,
@@ -33,7 +28,7 @@ const TasksSection = () => {
     };
   });
 
-  return data && data?.data?.length > 0 ? (
+  return data && data?.length > 0 ? (
     <Line
       key={"tasks_stats"}
       data={{ labels, datasets }}

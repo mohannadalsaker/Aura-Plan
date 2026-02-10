@@ -26,7 +26,7 @@ const TaskCommentsSection = () => {
               key={el as number}
               direction={"row"}
               gap={1}
-              alignItems={"flex-start"}
+              alignItems={"center"}
             >
               <Skeleton
                 sx={{
@@ -37,7 +37,7 @@ const TaskCommentsSection = () => {
               />
               <Skeleton
                 sx={{
-                  height: "7px",
+                  height: "20px",
                   width: "100%",
                 }}
               />

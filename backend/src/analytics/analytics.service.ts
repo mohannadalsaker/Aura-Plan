@@ -42,6 +42,11 @@ export class AnalyticsService {
           },
         },
       },
+      orderBy: {
+        tasks: {
+          _count: 'desc',
+        },
+      },
       take: 10,
     });
   }

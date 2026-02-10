@@ -1,18 +1,13 @@
-import { Bar } from "react-chartjs-2";
-import { useGetTopUsers } from "../api/useGetTopUsers";
-import Loader from "@/shared/components/Loader";
 import { Stack, Typography } from "@mui/material";
+import { Bar } from "react-chartjs-2";
+import type { UsersStatsdata } from "../types";
 
-const TopUsersSection = () => {
-  const { data, isLoading } = useGetTopUsers();
+const TopUsersSection = ({ data }: { data: UsersStatsdata[] }) => {
+  const labels = data?.map((user) => user.username);
 
-  if (isLoading) return <Loader />;
+  const taskCounts = data?.map((user) => user._count.tasks);
 
-  const labels = data?.data?.map((user) => user.username);
-
-  const taskCounts = data?.data?.map((user) => user._count.tasks);
-
-  const isTasksEmpty = data?.data?.reduce((acc, curr) => {
+  const isTasksEmpty = data?.reduce((acc, curr) => {
     return acc + curr._count.tasks;
   }, 0);
 

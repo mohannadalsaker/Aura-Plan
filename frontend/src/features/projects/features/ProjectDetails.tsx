@@ -11,13 +11,14 @@ import {
   Stack,
   Typography,
   useMediaQuery,
-  useTheme
+  useTheme,
 } from "@mui/material";
-import { ArrowLeft, Loader, Plus } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useProjectDetails } from "../hooks/useProjectDetails";
 import type { ProjectTasksTableRow } from "../types";
 import TaskView from "./TaskView";
+import Loader from "@/shared/components/Loader";
 
 const ProjectDetails = () => {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ const ProjectDetails = () => {
               gap={1}
               justifyContent={"space-between"}
               alignItems={"center"}
+              flexWrap={"wrap"}
             >
               <Stack direction={"row"} gap={1} alignItems={"center"}>
                 <IconButton onClick={() => navigate("/projects")}>
@@ -71,15 +73,44 @@ const ProjectDetails = () => {
                 Add Task <Plus size={20} />
               </MainButton>
             </Stack>
-            <Stack direction={"row"} gap={1} alignItems={"center"}>
-              <Typography sx={{ typography: "subtitle1", fontWeight: 500 }}>
-                Description:
-              </Typography>
-              <Typography
-                sx={{ typography: "subtitle1", color: "secondary.light" }}
-              >
-                {projectData?.description || "--------"}
-              </Typography>
+            <Stack
+              gap={4}
+              flexDirection={"row"}
+              alignItems={"center"}
+              flexWrap={"wrap"}
+            >
+              <Stack direction={"row"} gap={1} alignItems={"center"}>
+                <Typography sx={{ typography: "subtitle1", fontWeight: 500 }}>
+                  Description:
+                </Typography>
+                <Typography
+                  sx={{ typography: "subtitle1", color: "secondary.light" }}
+                >
+                  {projectData?.description || "--------"}
+                </Typography>
+              </Stack>
+              <Stack direction={"row"} gap={1} alignItems={"center"}>
+                <Typography sx={{ typography: "subtitle1", fontWeight: 500 }}>
+                  Manager:
+                </Typography>
+                <Typography
+                  sx={{ typography: "subtitle1", color: "secondary.light" }}
+                >
+                  {projectData?.manager?.username || "--------"}
+                </Typography>
+              </Stack>
+              <Stack direction={"row"} gap={1} alignItems={"center"}>
+                <Typography sx={{ typography: "subtitle1", fontWeight: 500 }}>
+                  Members:
+                </Typography>
+                <Typography
+                  sx={{ typography: "subtitle1", color: "secondary.light" }}
+                >
+                  {projectData?.members
+                    ?.map((mem) => mem.username)
+                    .join(", ") || "--------"}
+                </Typography>
+              </Stack>
             </Stack>
           </Stack>
           <Stack
