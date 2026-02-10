@@ -49,7 +49,7 @@ const UserForm = () => {
                 isRequired={true}
               />
               {openAdd ||
-              data?.data?.user?.role?.permissions?.includes(
+              data?.user?.role?.permissions?.includes(
                 Permissions.CHANGE_PASSWORD,
               ) ? (
                 <TextFieldInput
