@@ -48,9 +48,10 @@ const UserForm = () => {
                 helperText={errors.email?.message}
                 isRequired={true}
               />
-              {data?.data?.user?.role?.permissions?.includes(
+              {openAdd ||
+              data?.data?.user?.role?.permissions?.includes(
                 Permissions.CHANGE_PASSWORD,
-              ) ? null : (
+              ) ? (
                 <TextFieldInput
                   label="Password"
                   {...register("password")}
@@ -59,7 +60,7 @@ const UserForm = () => {
                   isRequired={Boolean(openAdd)}
                   helperText={errors.password?.message}
                 />
-              )}
+              ) : null}
               <SelectFieldInput
                 label="Role"
                 name="role_id"
